@@ -23,8 +23,8 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostEntity extends AbstractEntity {
-    @Column(name="user_id",nullable=false)
-    private UUID userId;
+    // @Column(name="user_id",nullable=false)
+    // private UUID userId;
     
     @Column(nullable=false)
     private String content;

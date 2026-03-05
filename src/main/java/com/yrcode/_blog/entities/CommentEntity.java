@@ -19,11 +19,11 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentEntity extends AbstractEntity {
-    @Column(nullable=false,name="user_id")
-    private UUID userId;
+    // @Column(nullable=false,name="user_id")
+    // private UUID userId;
 
-    @Column(nullable=false,name="post_id")
-    private UUID postId;
+    // @Column(nullable=false,name="post_id")
+    // private UUID postId;
 
     @Column(nullable=false)
     private String content;
