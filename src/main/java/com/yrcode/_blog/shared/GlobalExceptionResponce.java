@@ -16,4 +16,10 @@ public class GlobalExceptionResponce {
         var errors = List.of(new GlobalResponse.ErrorItem("Resource not found!"));
         return new ResponseEntity<>(new GlobalResponse<>(errors),HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(CustomResponseException.class)
+    public ResponseEntity<GlobalResponse<?>> handleCustomException(CustomResponseException ex) {
+        var errors = List.of(new GlobalResponse.ErrorItem(ex.getMessage()));
+        return new ResponseEntity<>(new GlobalResponse<>(errors),HttpStatus.NOT_FOUND);
+    }
 }
