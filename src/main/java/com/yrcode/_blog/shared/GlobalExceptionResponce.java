@@ -1,0 +1,19 @@
+package com.yrcode._blog.shared;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+@ControllerAdvice
+public class GlobalExceptionResponce {
+    /* had class bach nt7akem f les errors */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<GlobalResponse<?>> handleNoResponseException(NoResourceFoundException ex) {
+        var errors = List.of(new GlobalResponse.ErrorItem("Resource not found!"));
+        return new ResponseEntity<>(new GlobalResponse<>(errors),HttpStatus.NOT_FOUND);
+    }
+}
