@@ -2,8 +2,14 @@ package com.yrcode._blog.entities;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,12 +25,26 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommentEntity extends AbstractEntity {
-    // @Column(nullable=false,name="user_id")
-    // private UUID userId;
-
-    // @Column(nullable=false,name="post_id")
-    // private UUID postId;
-
+    @ManyToOne(fetch=FetchType.LAZY, optional=false)
+    @JoinColumn(nullable=false,name="user_id")
+    @OnDelete(action=OnDeleteAction.CASCADE)
+    private UserEntity userId;
+    
+    @ManyToOne(fetch=FetchType.LAZY,optional=false)
+    @JoinColumn(nullable=false,name="post_id")
+    @OnDelete(action=OnDeleteAction.CASCADE)
+    private PostEntity postId;
+    
     @Column(nullable=false)
     private String content;
+
+    public UUID getUserId() {
+        return userId.getId();
+    }
+
+
+    public UUID getPostId() {
+        return postId.getId();
+    }
+
 }
