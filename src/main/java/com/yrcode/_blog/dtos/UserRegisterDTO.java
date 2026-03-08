@@ -22,11 +22,11 @@ public record UserRegisterDTO(
     String email,
 
     @NotBlank(message = "Password is required!")
-    @Size(min = 8, message = "Password must be at least 8 characters") // 2. أقل حاجة 8 حروف
+    @Size(min = 8, message = "Password must be at least 8 characters")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$", 
              message = "Password must contain uppercase, lowercase, number and special character")
     String password,
 
     @NotBlank(message = "Password confirmation is required!")
-    String password_confirmation
+    String passwordConfirmation
 ) {}
