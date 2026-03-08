@@ -5,11 +5,11 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionResponce {
     /* had class bach nt7akem f les errors */
     @ExceptionHandler(NoResourceFoundException.class)
@@ -30,5 +30,11 @@ public class GlobalExceptionResponce {
             .map(err -> new GlobalResponse.ErrorItem(err.getField() + " " + err.getDefaultMessage()))
             .toList();
         return new ResponseEntity<>(new GlobalResponse<>(errors),HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<GlobalResponse<?>> handleGlobalException(Exception ex) {
+        var errors = List.of(new GlobalResponse.ErrorItem("Internal Server Error: Something went wrong!")); 
+        return new ResponseEntity<>(new GlobalResponse<>(errors), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
