@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserEntity extends AbstractEntity {
-    @Column(nullable=false, name="full_name")
+    @Column(name="full_name")
     private String fullName;
 
     @Column(nullable=false, unique=true)
