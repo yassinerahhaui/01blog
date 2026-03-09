@@ -9,5 +9,6 @@ import com.yrcode._blog.entities.UserEntity;
 
 @Repository
 public interface UserRepo extends JpaRepository<UserEntity, UUID> {
-
+    boolean existsByEmailAndIdNot(String email, UUID id);
+    boolean existsByUsernameAndIdNot(String username, UUID id);
 }
