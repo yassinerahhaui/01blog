@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.yrcode._blog.abstracts.UserService;
 import com.yrcode._blog.dtos.UserDetailsDTO;
 import com.yrcode._blog.dtos.UserRegisterDTO;
+import com.yrcode._blog.dtos.UserUpdateDTO;
 import com.yrcode._blog.entities.UserEntity;
 import com.yrcode._blog.repositories.UserRepo;
 import com.yrcode._blog.shared.CustomResponseException;
@@ -83,8 +84,29 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetailsDTO updateOne(UserEntity user){
-        return null;
+    public UserDetailsDTO updateOne(UserUpdateDTO data) {
+        /* get existing user */
+        UserEntity user = userRepo.findById(data.id())
+            .orElseThrow(()-> CustomResponseException.BadRequest("Invalid user id!"));
+
+        /* update user */
+        user.setFullName(data.fullName());
+        user.setUsername(data.username());
+        user.setEmail(data.email());
+        user.setAvatarUrl(data.avatarMedia());
+
+        /* save user */
+        UserEntity userSaved = userRepo.save(user);
+
+        /* return user with new data */
+        return UserDetailsDTO.builder()
+            .id(userSaved.getId())
+            .fullName(userSaved.getFullName())
+            .username(userSaved.getUsername())
+            .email(userSaved.getEmail())
+            .role(userSaved.getRole())
+            .access(userSaved.getAccess())
+            .build();
     }
     
 }
