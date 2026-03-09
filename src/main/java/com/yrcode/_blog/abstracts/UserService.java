@@ -5,12 +5,12 @@ import java.util.UUID;
 
 import com.yrcode._blog.dtos.UserDetailsDTO;
 import com.yrcode._blog.dtos.UserRegisterDTO;
-import com.yrcode._blog.entities.UserEntity;
+import com.yrcode._blog.dtos.UserUpdateDTO;
 
 public interface UserService {
     UserDetailsDTO findOne(UUID userId);
     List<UserDetailsDTO> findAll();
     UserDetailsDTO createOne(UserRegisterDTO user);
     void deleteOne(UUID userId);
-    UserDetailsDTO updateOne(UserEntity user);
+    UserDetailsDTO updateOne(UserUpdateDTO user);
 }
