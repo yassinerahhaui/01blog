@@ -30,3 +30,4 @@ public record UserRegisterDTO(
     @NotBlank(message = "Password confirmation is required!")
     String passwordConfirmation
 ) {}
+
