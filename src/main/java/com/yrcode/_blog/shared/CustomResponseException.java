@@ -28,4 +28,9 @@ public class CustomResponseException extends RuntimeException {
     public static CustomResponseException Unauthorized(String message) {
         return new CustomResponseException(401, message);
     }
+
+    // Conflict (409)
+    public static CustomResponseException Conflict(String message) {
+        return new CustomResponseException(409, message);
+    }
 }
