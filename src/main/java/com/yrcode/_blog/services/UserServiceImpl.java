@@ -54,17 +54,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDetailsDTO createOne(UserRegisterDTO user) {
+        /* check if password match password confirmation */
         if (!user.password().equals(user.passwordConfirmation())) {
             throw CustomResponseException.BadRequest("Passwords do not match!");
         }
+        /* check if email is already taken with other user */
+        if (userRepo.existsByEmail(user.email())) {
+            throw CustomResponseException.Conflict("Email is already taken with other user!");
+        }
+        /* check if username is already taken with other user */
+        if (userRepo.existsByUsername(user.username())) {
+            throw CustomResponseException.Conflict("Username is already taken with other user!");
+        }
+
+        /* create new user */
         UserEntity userData = UserEntity.builder()
             .username(user.username())
             .email(user.email())
             .password(user.password())
             .build();
 
+        /* save user in database */
         UserEntity savedUser = userRepo.save(userData);
 
+        /* return user info to controller */
         return UserDetailsDTO.builder()
             .id(savedUser.getId())
             .fullName(savedUser.getFullName())
@@ -88,7 +101,15 @@ public class UserServiceImpl implements UserService {
         /* get existing user */
         UserEntity user = userRepo.findById(data.id())
             .orElseThrow(()-> CustomResponseException.BadRequest("Invalid user id!"));
-
+        
+        /* check if email is already in use */
+        if (userRepo.existsByEmailAndIdNot(data.email(), data.id())) {
+            throw CustomResponseException.Conflict("This email is already taken!");
+        }
+        /* check if username is already in use */
+        if (userRepo.existsByUsernameAndIdNot(data.username(), data.id())) {
+            throw CustomResponseException.Conflict("This username is already taken!");
+        }
         /* update user */
         user.setFullName(data.fullName());
         user.setUsername(data.username());
