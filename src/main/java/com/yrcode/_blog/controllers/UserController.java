@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.yrcode._blog.abstracts.UserService;
-import com.yrcode._blog.dtos.UserDetailsDTO;
-import com.yrcode._blog.dtos.UserRegisterDTO;
-import com.yrcode._blog.dtos.UserUpdateDTO;
+import com.yrcode._blog.dtos.user.UserDetailsDTO;
+import com.yrcode._blog.dtos.user.UserRegisterDTO;
+import com.yrcode._blog.dtos.user.UserUpdateDTO;
 import com.yrcode._blog.shared.GlobalResponse;
 
 import jakarta.validation.Valid;

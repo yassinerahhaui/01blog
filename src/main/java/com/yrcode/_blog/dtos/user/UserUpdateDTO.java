@@ -1,13 +1,22 @@
-package com.yrcode._blog.dtos;
+package com.yrcode._blog.dtos.user;
+
+import java.util.UUID;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
-public record UserRegisterDTO(
+public record UserUpdateDTO(
+    @NotNull(message = "User id is required!")
+    UUID id,
+
+    @NotBlank(message = "Username is required!")
+    @Size(min = 2, max = 60, message = "Username must be between 2 and 60 characters")
+    String fullName,
 
     @NotBlank(message = "Username is required!")
     @Size(min = 2, max = 60, message = "Username must be between 2 and 60 characters")
@@ -21,12 +30,6 @@ public record UserRegisterDTO(
     )
     String email,
 
-    @NotBlank(message = "Password is required!")
-    @Size(min = 8, message = "Password must be at least 8 characters")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$", 
-             message = "Password must contain uppercase, lowercase, number and special character")
-    String password,
-
-    @NotBlank(message = "Password confirmation is required!")
-    String passwordConfirmation
+    @Size(max = 255, message = "avatar url must be less than 255 characters")
+    String avatarUrl
 ) {}

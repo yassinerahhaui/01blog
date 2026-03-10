@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yrcode._blog.abstracts.UserService;
-import com.yrcode._blog.dtos.UserDetailsDTO;
-import com.yrcode._blog.dtos.UserRegisterDTO;
-import com.yrcode._blog.dtos.UserUpdateDTO;
+import com.yrcode._blog.dtos.user.UserDetailsDTO;
+import com.yrcode._blog.dtos.user.UserRegisterDTO;
+import com.yrcode._blog.dtos.user.UserUpdateDTO;
 import com.yrcode._blog.entities.UserEntity;
 import com.yrcode._blog.repositories.UserRepo;
 import com.yrcode._blog.shared.CustomResponseException;

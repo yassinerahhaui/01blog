@@ -1,4 +1,4 @@
-package com.yrcode._blog.dtos;
+package com.yrcode._blog.dtos.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -3,9 +3,9 @@ package com.yrcode._blog.abstracts;
 import java.util.List;
 import java.util.UUID;
 
-import com.yrcode._blog.dtos.UserDetailsDTO;
-import com.yrcode._blog.dtos.UserRegisterDTO;
-import com.yrcode._blog.dtos.UserUpdateDTO;
+import com.yrcode._blog.dtos.user.UserDetailsDTO;
+import com.yrcode._blog.dtos.user.UserRegisterDTO;
+import com.yrcode._blog.dtos.user.UserUpdateDTO;
 
 public interface UserService {
     UserDetailsDTO findOne(UUID userId);
