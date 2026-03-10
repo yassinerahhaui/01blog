@@ -7,8 +7,11 @@ import org.springframework.stereotype.Repository;
 
 import com.yrcode._blog.entities.UserEntity;
 
+
 @Repository
 public interface UserRepo extends JpaRepository<UserEntity, UUID> {
     boolean existsByEmailAndIdNot(String email, UUID id);
     boolean existsByUsernameAndIdNot(String username, UUID id);
+    boolean existsByEmail(String email);
+    boolean existsByUsername(String username);
 }
