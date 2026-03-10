@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
         user.setFullName(data.fullName());
         user.setUsername(data.username());
         user.setEmail(data.email());
-        user.setAvatarUrl(data.avatarMedia());
+        user.setAvatarUrl(data.avatarUrl());
 
         /* save user */
         UserEntity userSaved = userRepo.save(user);

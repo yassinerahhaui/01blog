@@ -4,13 +4,14 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder
 public record UserUpdateDTO(
-    @NotBlank(message = "User id is required!")
+    @NotNull(message = "User id is required!")
     UUID id,
 
     @NotBlank(message = "Username is required!")
@@ -29,6 +30,6 @@ public record UserUpdateDTO(
     )
     String email,
 
-    @Size(min = 6, max = 255, message = "Username must be less than 255 characters")
-    String avatarMedia
+    @Size(max = 255, message = "avatar url must be less than 255 characters")
+    String avatarUrl
 ) {}
