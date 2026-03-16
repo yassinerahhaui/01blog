@@ -10,7 +10,11 @@ import lombok.Builder;
 public record UserRegisterDTO(
 
     @NotBlank(message = "Username is required!")
-    @Size(min = 2, max = 60, message = "Username must be between 2 and 60 characters")
+    @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
+    @Pattern(
+        regexp = "^[a-zA-Z0-9_-]+$", 
+        message = "Username can only contain letters, numbers, dashes (-), and underscores (_)"
+    )
     String username,
 
     @NotBlank(message = "Email is required!")
