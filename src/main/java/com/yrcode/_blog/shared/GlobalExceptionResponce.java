@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -36,5 +37,12 @@ public class GlobalExceptionResponce {
     public ResponseEntity<GlobalResponse<?>> handleGlobalException(Exception ex) {
         var errors = List.of(new GlobalResponse.ErrorItem("Internal Server Error: Something went wrong!")); 
         return new ResponseEntity<>(new GlobalResponse<>(errors), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<GlobalResponse<?>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        // Catch invalid Enum values (like sending "GIF" when only "IMAGE" or "VIDEO" exist)
+        var errors = List.of(new GlobalResponse.ErrorItem("Invalid data format or missing required fields. Please check your inputs (e.g., correct MediaType)."));
+        return new ResponseEntity<>(new GlobalResponse<>(errors), HttpStatus.BAD_REQUEST);
     }
 }
