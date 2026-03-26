@@ -5,6 +5,7 @@ import java.util.UUID;
 import static java.util.stream.Collectors.toList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.yrcode._blog.abstracts.UserService;
@@ -19,6 +20,9 @@ import com.yrcode._blog.shared.CustomResponseException;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetailsDTO findOne(UUID userId){
@@ -71,7 +75,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userData = UserEntity.builder()
             .username(user.username())
             .email(user.email())
-            .password(user.password())
+            .password(passwordEncoder.encode(user.password()))
             .build();
 
         /* save user in database */
