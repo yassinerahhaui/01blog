@@ -1,5 +1,10 @@
 package com.yrcode._blog.entities;
 
+import java.util.Collection;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import com.yrcode._blog.enums.Access;
 import com.yrcode._blog.enums.Role;
 
@@ -21,7 +26,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity extends AbstractEntity {
+public class UserEntity extends AbstractEntity implements UserDetails {
     @Column(name="full_name")
     private String fullName;
 
@@ -44,4 +49,9 @@ public class UserEntity extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @lombok.Builder.Default
     private Access access = Access.ENABLED;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
 }
