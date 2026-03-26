@@ -1,5 +1,6 @@
 package com.yrcode._blog.repositories;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface UserRepo extends JpaRepository<UserEntity, UUID> {
     boolean existsByUsernameAndIdNot(String username, UUID id);
     boolean existsByEmail(String email);
     boolean existsByUsername(String username);
+    Optional<UserEntity> findOneByUsername(String username);
+    Optional<UserEntity> findOneByEmail(String email);
 }
