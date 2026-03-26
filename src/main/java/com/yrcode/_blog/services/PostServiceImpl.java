@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.*;
 import java.util.List;
 import java.util.UUID;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.yrcode._blog.abstracts.PostService;
@@ -25,6 +26,7 @@ public class PostServiceImpl implements PostService {
             .orElseThrow(()-> CustomResponseException.BadRequest("invalid post id!"));
         return PostDetailsDTO.builder()
             .id(post.getId())
+            .title(post.getTitle())
             .content(post.getContent())
             .mediaUrl(post.getMediaUrl())
             .mediaType(post.getMediaType())
@@ -38,6 +40,7 @@ public class PostServiceImpl implements PostService {
         return posts.stream()
             .map(post -> PostDetailsDTO.builder()
                 .id(post.getId())
+                .title(post.getTitle())
                 .content(post.getContent())
                 .mediaUrl(post.getMediaUrl())
                 .mediaType(post.getMediaType())
@@ -48,6 +51,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDetailsDTO createOne(PostCreateDTO data) {
+
         return null;
     }
 
