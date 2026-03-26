@@ -29,6 +29,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostEntity extends AbstractEntity {
+
+    @Column(nullable=false)
+    private String title;
+
     @Column(nullable=false,columnDefinition="TEXT")
     private String content;
     
