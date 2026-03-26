@@ -10,6 +10,7 @@ import lombok.Builder;
 @Builder
 public record PostDetailsDTO(
     UUID id,
+    String title,
     String content,
     String mediaUrl,
     MediaType mediaType,
