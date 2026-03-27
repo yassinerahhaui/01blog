@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.UUID;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.yrcode._blog.abstracts.PostService;
 import com.yrcode._blog.dtos.post.PostCreateDTO;
@@ -16,8 +16,11 @@ import com.yrcode._blog.entities.PostEntity;
 import com.yrcode._blog.repositories.PostRepo;
 import com.yrcode._blog.shared.CustomResponseException;
 
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-    @Autowired
     private PostRepo postRepo;
     
     @Override

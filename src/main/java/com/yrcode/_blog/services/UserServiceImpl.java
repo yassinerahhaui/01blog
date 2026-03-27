@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 import static java.util.stream.Collectors.toList;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yrcode._blog.abstracts.UserService;
@@ -14,9 +13,11 @@ import com.yrcode._blog.entities.UserEntity;
 import com.yrcode._blog.repositories.UserRepo;
 import com.yrcode._blog.shared.CustomResponseException;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
     private UserRepo userRepo;
 
     @Override
