@@ -11,13 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.yrcode._blog.abstracts.UserService;
 import com.yrcode._blog.dtos.user.UserDetailsDTO;
-import com.yrcode._blog.dtos.user.UserRegisterDTO;
 import com.yrcode._blog.dtos.user.UserUpdateDTO;
 import com.yrcode._blog.shared.GlobalResponse;
 
@@ -42,12 +40,6 @@ public class UserController {
     public ResponseEntity<GlobalResponse<UserDetailsDTO>> findOne(@PathVariable UUID userId) {
         UserDetailsDTO userDetails = userService.findOne(userId);
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(userDetails));
-    }
-
-    @PostMapping("/create")
-    public ResponseEntity<GlobalResponse<UserDetailsDTO>> createOne(@RequestBody @Valid UserRegisterDTO userData) {
-        UserDetailsDTO user = userService.createOne(userData);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(user));
     }
     
     @DeleteMapping("/{userId}")
