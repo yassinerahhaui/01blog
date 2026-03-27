@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -44,5 +45,11 @@ public class GlobalExceptionResponce {
         // Catch invalid Enum values (like sending "GIF" when only "IMAGE" or "VIDEO" exist)
         var errors = List.of(new GlobalResponse.ErrorItem("Invalid data format or missing required fields. Please check your inputs (e.g., correct MediaType)."));
         return new ResponseEntity<>(new GlobalResponse<>(errors), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({BadCredentialsException.class})
+    public ResponseEntity<GlobalResponse<?>> handleBadCredentials(BadCredentialsException ex) {
+        var errors = List.of(new GlobalResponse.ErrorItem(ex.getMessage())); 
+        return new ResponseEntity<>(new GlobalResponse<>(errors), HttpStatus.UNAUTHORIZED);
     }
 }
