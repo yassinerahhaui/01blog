@@ -29,8 +29,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid UserLoginDTO userData) {
+    public ResponseEntity<GlobalResponse<String>> login(@RequestBody @Valid UserLoginDTO userData) {
         String token = authService.login(userData);
-        return ResponseEntity.status(HttpStatus.OK).body(token);
+        return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(token));
     }
 }

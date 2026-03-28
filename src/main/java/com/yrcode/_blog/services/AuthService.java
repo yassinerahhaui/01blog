@@ -1,6 +1,9 @@
 package com.yrcode._blog.services;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +20,7 @@ import com.yrcode._blog.dtos.user.UserLoginDTO;
 import com.yrcode._blog.dtos.user.UserRegisterDTO;
 import com.yrcode._blog.entities.UserEntity;
 import com.yrcode._blog.repositories.UserRepo;
+import com.yrcode._blog.security.JwtHelper;
 import com.yrcode._blog.shared.CustomResponseException;
 
 @Service
@@ -32,6 +36,9 @@ public class AuthService implements UserDetailsService {
     @Autowired
     @Lazy
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtHelper jwtHelper;
 
     public UserDetailsDTO register(UserRegisterDTO user) {
         /* check if password match password confirmation */
@@ -73,14 +80,21 @@ public class AuthService implements UserDetailsService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.username(), user.password())
         );
-        return "Token...";
+
+        UserEntity account = userRepo.findOneByUsername(user.username())
+                .or(() -> userRepo.findOneByEmail(user.username()))
+                .orElseThrow(() -> CustomResponseException.Unauthorized("Bad credentials!"));
+
+        Map<String,Object> customClaims = new HashMap<>();
+        customClaims.put("userId", account.getId());
+        return jwtHelper.generateToken(customClaims,account);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity account = userRepo.findOneByUsername(username)
                 .or(() -> userRepo.findOneByEmail(username))
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with: " + username));
+                .orElseThrow(() -> CustomResponseException.Unauthorized("Bad credentials!"));
 
         return User.builder()
                 .username(account.getUsername())
