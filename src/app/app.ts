@@ -1,12 +1,24 @@
 import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { Navbar } from './components/navbar/navbar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet,Navbar],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('01blog-frontend');
+  username = signal('Admin');
+  showNavbar = signal(true);
+  
+  constructor(private router: Router) {
+    this.router.events.subscribe((e) => {
+      if (e instanceof NavigationEnd) {
+        const currentUrl = e.urlAfterRedirects;
+        const isAuthPage = currentUrl.includes('/login') || currentUrl.includes('/register');
+        this.showNavbar.set(!isAuthPage);
+      }
+    })
+  }
 }
