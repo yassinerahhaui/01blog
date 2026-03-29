@@ -54,7 +54,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDetailsDTO createOne(PostCreateDTO data) {
-
+        
         return null;
     }
 

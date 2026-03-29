@@ -51,4 +51,8 @@ public class PostEntity extends AbstractEntity {
     public UUID getUserId() {
         return  userId.getId();
     }
+
+    public String getUsername() {
+        return userId.getUsername();
+    }
 }

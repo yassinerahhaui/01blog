@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.yrcode._blog.dtos.user.UserDetailsDTO;
+import com.yrcode._blog.dtos.user.AuthResponse;
 import com.yrcode._blog.dtos.user.UserLoginDTO;
 import com.yrcode._blog.dtos.user.UserRegisterDTO;
 import com.yrcode._blog.services.AuthService;
@@ -23,14 +23,14 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<GlobalResponse<UserDetailsDTO>> register(@RequestBody @Valid UserRegisterDTO userData) {
-        UserDetailsDTO user = authService.register(userData);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(user));
+    public ResponseEntity<GlobalResponse<AuthResponse>> register(@RequestBody @Valid UserRegisterDTO userData) {
+        var res = AuthResponse.builder().token(authService.register(userData)).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(res));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<GlobalResponse<String>> login(@RequestBody @Valid UserLoginDTO userData) {
-        String token = authService.login(userData);
+    public ResponseEntity<GlobalResponse<AuthResponse>> login(@RequestBody @Valid UserLoginDTO userData) {
+        var token = AuthResponse.builder().token(authService.login(userData)).build();
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(token));
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.yrcode._blog.dtos.user.UserDetailsDTO;
 import com.yrcode._blog.dtos.user.UserLoginDTO;
 import com.yrcode._blog.dtos.user.UserRegisterDTO;
 import com.yrcode._blog.entities.UserEntity;
@@ -40,7 +39,7 @@ public class AuthService implements UserDetailsService {
     @Autowired
     private JwtHelper jwtHelper;
 
-    public UserDetailsDTO register(UserRegisterDTO user) {
+    public String register(UserRegisterDTO user) {
         /* check if password match password confirmation */
         if (!user.password().equals(user.passwordConfirmation())) {
             throw CustomResponseException.BadRequest("Passwords do not match!");
@@ -62,18 +61,17 @@ public class AuthService implements UserDetailsService {
                 .build();
 
         /* save user in database */
-        UserEntity savedUser = userRepo.save(userData);
+        userRepo.save(userData);
 
-        /* return user info to controller */
-        return UserDetailsDTO.builder()
-                .id(savedUser.getId())
-                .fullName(savedUser.getFullName())
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .avatarUrl(savedUser.getAvatarUrl())
-                .role(savedUser.getRole())
-                .access(savedUser.getAccess())
-                .build();
+        /* authenticate user */
+        var userLogin = UserLoginDTO.builder()
+            .username(user.username())
+            .password(user.password())
+            .build();
+        String token = login(userLogin);
+
+        /* return jwt token */
+        return token;
     }
 
     public String login(UserLoginDTO user) {
