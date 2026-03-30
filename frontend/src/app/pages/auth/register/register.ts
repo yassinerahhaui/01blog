@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../../core/services/auth';
 import { RegisterRequest } from '../../../core/models/register-request';
@@ -22,15 +22,23 @@ export class Register {
     passwordConfirmation: ''
   };
 
+  errorMessage = signal<string | null>(null);
+
   onRegister() {
+    this.errorMessage.set(null);
     this.authService.register(this.registerData).subscribe({
       next: ()=> {
         this.router.navigate(['/']);
       },
       error: (err) => {
-        console.error("Server Error: ", err.status);
-        if (err.error && err.error.errors) {
-            console.error("Validation details: ", err.error.errors);
+        if (err.error?.errors?.[0]?.message) {
+          this.errorMessage.set(err.error.errors[0].message);
+        } else if (err.error?.message) {
+          this.errorMessage.set(err.error.message);
+        } else if (typeof err.error === 'string') {
+          this.errorMessage.set(err.error);
+        } else {
+          this.errorMessage.set("Registration failed. Please try again.");
         }
       }
     })
