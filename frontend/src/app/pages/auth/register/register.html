@@ -1,1 +1,50 @@
-<p>register works!</p>
+<div class="card overflow-hidden position-absolute top-50 start-50 translate-middle shadow-lg border-0" style="width: 90%; max-width: 900px; border-radius: 1rem;">
+  <div class="row g-0">
+
+    <div class="col-md-6 bg-white p-4 p-md-5">
+      <div class="text-center mb-4">
+        <h3 class="fs-2 fw-bold text-primary">Create Account</h3>
+        <p class="text-muted">Join 01Blog and start sharing your ideas</p>
+      </div>
+
+      <form>
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="usernameInput" placeholder="Username" required>
+          <label for="usernameInput" class="text-muted">Username</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
+          <label for="emailInput" class="text-muted">Email address</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" id="passwordInput" placeholder="Password" required>
+          <label for="passwordInput" class="text-muted">Password</label>
+        </div>
+
+        <div class="form-floating mb-4">
+          <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" required>
+          <label for="confirmPasswordInput" class="text-muted">Confirm Password</label>
+        </div>
+
+        <button class="btn btn-primary w-100 py-3 fs-5 fw-bold rounded-3 shadow-sm" type="submit">
+          Sign Up
+        </button>
+
+        <div class="text-center mt-4">
+          <p class="mb-0 text-muted">Already have an account? <a routerLink="/login" class="text-primary fw-bold text-decoration-none">Sign in here</a></p>
+        </div>
+      </form>
+
+    </div>
+
+    <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center bg-primary-subtle text-white p-5" data-bs-theme="dark">
+      <div class="text-center">
+        <h2 class="fw-bold mb-4">Join Our Community!</h2>
+        <p class="lead mb-4">Become a part of 01Blog today. Create your account to start writing, connecting, and growing with other developers.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
