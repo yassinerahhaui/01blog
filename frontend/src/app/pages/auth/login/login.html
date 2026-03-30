@@ -14,14 +14,14 @@
         <p class="text-muted">Enter your details to access your account</p>
       </div>
 
-      <form>
+      <form (ngSubmit)="onLogin()">
         <div class="form-floating mb-3">
-          <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
-          <label for="emailInput" class="text-muted">Email address</label>
+          <input type="text" class="form-control" name="username" [(ngModel)]="loginData.username" id="usernameInput" placeholder="Enter your username or email..." required>
+          <label for="usernameInput" class="text-muted">Email or username</label>
         </div>
 
         <div class="form-floating mb-3">
-          <input type="password" class="form-control" id="passwordInput" placeholder="Password" required>
+          <input type="password" name="password" [(ngModel)]="loginData.password" class="form-control" id="passwordInput" placeholder="Password" required>
           <label for="passwordInput" class="text-muted">Password</label>
         </div>
 

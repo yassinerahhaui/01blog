@@ -1,10 +1,34 @@
-import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { LoginRequest } from '../../../core/models/login-request';
+import { Auth } from '../../../core/services/auth';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink],
+  imports: [RouterLink,FormsModule],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {}
+export class Login {
+  private authService = inject(Auth);
+  private router = inject(Router);
+  loginData: LoginRequest = {
+    username: '',
+    password: ''
+  };
+
+  onLogin() {
+    this.authService.login(this.loginData).subscribe({
+      next: ()=> {
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        console.error("Server Error: ", err.status);
+        if (err.error && err.error.errors) {
+            console.error("Validation details: ", err.error.errors);
+        }
+      }
+    })
+  }
+}
