@@ -14,15 +14,40 @@
         <p class="text-muted">Enter your details to access your account</p>
       </div>
 
-      <form (ngSubmit)="onLogin()">
+      <form #loginForm="ngForm" (ngSubmit)="onLogin()">
+
         <div class="form-floating mb-3">
-          <input type="text" class="form-control" name="username" [(ngModel)]="loginData.username" id="usernameInput" placeholder="Enter your username or email..." required>
+          <input type="text" class="form-control"
+                 [ngClass]="{ 'is-invalid': usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched) }"
+                 name="username" [(ngModel)]="loginData.username"
+                 id="usernameInput" placeholder="Enter your username or email..."
+                 required minlength="3"
+                 #usernameCtrl="ngModel">
           <label for="usernameInput" class="text-muted">Email or username</label>
+
+          @if (usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched)) {
+            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
+              @if (usernameCtrl.errors?.['required']) { <div>Username is required.</div> }
+              @if (usernameCtrl.errors?.['minlength']) { <div>Must be at least 3 characters.</div> }
+            </div>
+          }
         </div>
 
         <div class="form-floating mb-3">
-          <input type="password" name="password" [(ngModel)]="loginData.password" class="form-control" id="passwordInput" placeholder="Password" required>
+          <input type="password" class="form-control"
+                 [ngClass]="{ 'is-invalid': passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched) }"
+                 id="passwordInput" placeholder="Password"
+                 name="password" [(ngModel)]="loginData.password"
+                 required minlength="6"
+                 #passwordCtrl="ngModel">
           <label for="passwordInput" class="text-muted">Password</label>
+
+          @if (passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)) {
+            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
+              @if (passwordCtrl.errors?.['required']) { <div>Password is required.</div> }
+              @if (passwordCtrl.errors?.['minlength']) { <div>Must be at least 6 characters.</div> }
+            </div>
+          }
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -35,7 +60,9 @@
           <a href="#" class="text-decoration-none text-primary fw-semibold text-sm">Forgot password?</a>
         </div>
 
-        <button class="btn btn-primary w-100 py-3 fs-5 fw-bold rounded-3 shadow-sm" type="submit">
+        <button class="btn btn-primary w-100 py-3 fs-5 fw-bold rounded-3 shadow-sm"
+                type="submit"
+                [disabled]="loginForm.invalid">
           Sign In
         </button>
 
