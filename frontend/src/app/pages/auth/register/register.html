@@ -7,24 +7,24 @@
         <p class="text-muted">Join 01Blog and start sharing your ideas</p>
       </div>
 
-      <form>
+      <form (ngSubmit)="onRegister()">
         <div class="form-floating mb-3">
-          <input type="text" class="form-control" id="usernameInput" placeholder="Username" required>
+          <input type="text" name="username" [(ngModel)]="registerData.username" class="form-control" id="usernameInput" placeholder="Username" required>
           <label for="usernameInput" class="text-muted">Username</label>
         </div>
 
         <div class="form-floating mb-3">
-          <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" required>
+          <input type="email" name="email" [(ngModel)]="registerData.email" class="form-control" id="emailInput" placeholder="name@example.com" required>
           <label for="emailInput" class="text-muted">Email address</label>
         </div>
 
         <div class="form-floating mb-3">
-          <input type="password" class="form-control" id="passwordInput" placeholder="Password" required>
+          <input type="password" name="password" [(ngModel)]="registerData.password" class="form-control" id="passwordInput" placeholder="Password" required>
           <label for="passwordInput" class="text-muted">Password</label>
         </div>
 
         <div class="form-floating mb-4">
-          <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" required>
+          <input type="password" name="passwordConfirmation" [(ngModel)]="registerData.passwordConfirmation" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" required>
           <label for="confirmPasswordInput" class="text-muted">Confirm Password</label>
         </div>
 
