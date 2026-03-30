@@ -7,28 +7,76 @@
         <p class="text-muted">Join 01Blog and start sharing your ideas</p>
       </div>
 
-      <form (ngSubmit)="onRegister()">
+      <form #registerForm="ngForm" (ngSubmit)="onRegister()">
+
         <div class="form-floating mb-3">
-          <input type="text" name="username" [(ngModel)]="registerData.username" class="form-control" id="usernameInput" placeholder="Username" required>
+          <input type="text" class="form-control" id="usernameInput" placeholder="Username"
+                 name="username" [(ngModel)]="registerData.username"
+                 required minlength="3" maxlength="20" pattern="^[a-zA-Z0-9_-]+$"
+                 #usernameCtrl="ngModel"
+                 [ngClass]="{ 'is-invalid': usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched) }">
           <label for="usernameInput" class="text-muted">Username</label>
+
+          @if (usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched)) {
+            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
+              @if (usernameCtrl.errors?.['required']) { <div>Username is required.</div> }
+              @if (usernameCtrl.errors?.['minlength'] || usernameCtrl.errors?.['maxlength']) { <div>Username must be between 3 and 20 characters.</div> }
+              @if (usernameCtrl.errors?.['pattern']) { <div>Only letters, numbers, dashes (-), and underscores (_) are allowed.</div> }
+            </div>
+          }
         </div>
 
         <div class="form-floating mb-3">
-          <input type="email" name="email" [(ngModel)]="registerData.email" class="form-control" id="emailInput" placeholder="name@example.com" required>
+          <input type="email" class="form-control" id="emailInput" placeholder="name@example.com"
+                 name="email" [(ngModel)]="registerData.email"
+                 required pattern="^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,4}$"
+                 #emailCtrl="ngModel"
+                 [ngClass]="{ 'is-invalid': emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched) }">
           <label for="emailInput" class="text-muted">Email address</label>
+
+          @if (emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched)) {
+            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
+              @if (emailCtrl.errors?.['required']) { <div>Email is required.</div> }
+              @if (emailCtrl.errors?.['pattern']) { <div>Must be a valid email (e.g. user@example.com).</div> }
+            </div>
+          }
         </div>
 
         <div class="form-floating mb-3">
-          <input type="password" name="password" [(ngModel)]="registerData.password" class="form-control" id="passwordInput" placeholder="Password" required>
+          <input type="password" class="form-control" id="passwordInput" placeholder="Password"
+                 name="password" [(ngModel)]="registerData.password"
+                 required minlength="8" pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$"
+                 #passwordCtrl="ngModel"
+                 [ngClass]="{ 'is-invalid': passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched) }">
           <label for="passwordInput" class="text-muted">Password</label>
+
+          @if (passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)) {
+            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
+              @if (passwordCtrl.errors?.['required']) { <div>Password is required.</div> }
+              @if (passwordCtrl.errors?.['minlength']) { <div>Must be at least 8 characters.</div> }
+              @if (passwordCtrl.errors?.['pattern']) { <div>Must contain uppercase, lowercase, number, and special character.</div> }
+            </div>
+          }
         </div>
 
         <div class="form-floating mb-4">
-          <input type="password" name="passwordConfirmation" [(ngModel)]="registerData.passwordConfirmation" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password" required>
+          <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password"
+                 name="passwordConfirmation" [(ngModel)]="registerData.passwordConfirmation"
+                 required
+                 #confirmCtrl="ngModel"
+                 [ngClass]="{ 'is-invalid': (confirmCtrl.invalid || registerData.password !== registerData.passwordConfirmation) && (confirmCtrl.dirty || confirmCtrl.touched) }">
           <label for="confirmPasswordInput" class="text-muted">Confirm Password</label>
+
+          @if ((confirmCtrl.invalid || registerData.password !== registerData.passwordConfirmation) && (confirmCtrl.dirty || confirmCtrl.touched)) {
+            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
+              @if (confirmCtrl.errors?.['required']) { <div>Password confirmation is required.</div> }
+              @if (!confirmCtrl.errors?.['required'] && registerData.password !== registerData.passwordConfirmation) { <div>Passwords do not match!</div> }
+            </div>
+          }
         </div>
 
-        <button class="btn btn-primary w-100 py-3 fs-5 fw-bold rounded-3 shadow-sm" type="submit">
+        <button class="btn btn-primary w-100 py-3 fs-5 fw-bold rounded-3 shadow-sm" type="submit"
+                [disabled]="registerForm.invalid || registerData.password !== registerData.passwordConfirmation">
           Sign Up
         </button>
 
