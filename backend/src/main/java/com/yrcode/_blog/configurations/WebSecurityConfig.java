@@ -19,10 +19,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.yrcode._blog.security.JwtAuthFilter;
 import com.yrcode._blog.services.AuthService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class WebSecurityConfig {
+
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -34,11 +37,15 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
+                .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error: Unauthorized - Token is invalid or missing");
+                }))
                 .authorizeHttpRequests(req -> req.requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager(http))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
 
