@@ -1,19 +1,21 @@
-import { Component } from '@angular/core';
-import { NgbCollapseModule, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
-  imports: [NgbCollapseModule, NgbDropdownModule, CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
 export class Navbar {
   public isMenuCollapsed = true;
+  router = inject(Router);
 
   onLogout() {
     localStorage.removeItem('token');
     console.log('Logged out successfully');
+    this.router.navigate(['/login']);
+    console.clear()
   }
 }
