@@ -1,11 +1,14 @@
-<div class="card overflow-hidden position-absolute top-50 start-50 translate-middle shadow-lg border-0" style="width: 90%; max-width: 900px; border-radius: 1rem;">
+<div class="card overflow-hidden position-absolute top-50 start-50 translate-middle shadow-lg border-0"
+  style="width: 90%; max-width: 900px; border-radius: 1rem;">
   <div class="row g-0">
 
-    <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center bg-primary-subtle text-white p-5" data-bs-theme="dark">
+    <div class="col-md-6 d-none d-md-flex align-items-center justify-content-center bg-primary-subtle text-white p-5"
+      data-bs-theme="dark">
       <div class="text-center">
         <h2 class="fw-bold mb-4">Welcome to 01Blog!</h2>
-        <p class="lead mb-4">Your favorite platform to share ideas and connect with developers. Log in now to get started.</p>
-        </div>
+        <p class="lead mb-4">Your favorite platform to share ideas and connect with developers. Log in now to get
+          started.</p>
+      </div>
     </div>
 
     <div class="col-md-6 bg-white p-4 p-md-5">
@@ -14,39 +17,47 @@
         <p class="text-muted">Enter your details to access your account</p>
       </div>
 
+      @if (errorMessage() != null) {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ errorMessage()}}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      }
+
       <form #loginForm="ngForm" (ngSubmit)="onLogin()">
 
         <div class="form-floating mb-3">
           <input type="text" class="form-control"
-                 [ngClass]="{ 'is-invalid': usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched) }"
-                 name="username" [(ngModel)]="loginData.username"
-                 id="usernameInput" placeholder="Enter your username or email..."
-                 required minlength="3"
-                 #usernameCtrl="ngModel">
+            [ngClass]="{ 'is-invalid': usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched) }"
+            name="username" [(ngModel)]="loginData.username" id="usernameInput"
+            placeholder="Enter your username or email..." required minlength="3" #usernameCtrl="ngModel">
           <label for="usernameInput" class="text-muted">Email or username</label>
 
           @if (usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched)) {
-            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
-              @if (usernameCtrl.errors?.['required']) { <div>Username is required.</div> }
-              @if (usernameCtrl.errors?.['minlength']) { <div>Must be at least 3 characters.</div> }
-            </div>
+          <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
+            @if (usernameCtrl.errors?.['required']) { <div>Username is required.</div> }
+            @if (usernameCtrl.errors?.['minlength']) { <div>Must be at least 3 characters.</div> }
+          </div>
           }
         </div>
 
         <div class="form-floating mb-3">
           <input type="password" class="form-control"
-                 [ngClass]="{ 'is-invalid': passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched) }"
-                 id="passwordInput" placeholder="Password"
-                 name="password" [(ngModel)]="loginData.password"
-                 required minlength="6"
-                 #passwordCtrl="ngModel">
+            [ngClass]="{ 'is-invalid': passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched) }"
+            id="passwordInput" placeholder="Password" name="password" [(ngModel)]="loginData.password" required
+            minlength="6" #passwordCtrl="ngModel">
           <label for="passwordInput" class="text-muted">Password</label>
 
           @if (passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)) {
-            <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
-              @if (passwordCtrl.errors?.['required']) { <div>Password is required.</div> }
-              @if (passwordCtrl.errors?.['minlength']) { <div>Must be at least 6 characters.</div> }
-            </div>
+          <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">  <div class="alert alert-danger fw-semibold alert-dismissible fade show" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ errorMessage()}}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+            @if (passwordCtrl.errors?.['required']) { <div>Password is required.</div> }
+            @if (passwordCtrl.errors?.['minlength']) { <div>Must be at least 6 characters.</div> }
+          </div>
           }
         </div>
 
@@ -57,17 +68,17 @@
               Remember me
             </label>
           </div>
-          <a href="#" class="text-decoration-none text-primary fw-semibold text-sm">Forgot password?</a>
+          <!-- <a href="#" class="text-decoration-none text-primary fw-semibold text-sm">Forgot password?</a> -->
         </div>
 
-        <button class="btn btn-primary w-100 py-3 fs-5 fw-bold rounded-3 shadow-sm"
-                type="submit"
-                [disabled]="loginForm.invalid">
+        <button class="btn btn-primary w-100 py-3 fs-5 fw-bold rounded-3 shadow-sm" type="submit"
+          [disabled]="loginForm.invalid">
           Sign In
         </button>
 
         <div class="text-center mt-4">
-          <p class="mb-0 text-muted">Don't have an account? <a routerLink="/register" class="text-primary fw-bold text-decoration-none">Sign up now</a></p>
+          <p class="mb-0 text-muted">Don't have an account? <a routerLink="/register"
+              class="text-primary fw-bold text-decoration-none">Sign up now</a></p>
         </div>
       </form>
 

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LoginRequest } from '../../../core/models/login-request';
 import { Auth } from '../../../core/services/auth';
@@ -18,16 +18,19 @@ export class Login {
     username: '',
     password: ''
   };
+  errorMessage = signal<string | null>(null);
 
   onLogin() {
+    this.errorMessage.set(null);
     this.authService.login(this.loginData).subscribe({
       next: ()=> {
         this.router.navigate(['/']);
       },
       error: (err) => {
-        console.error("Server Error: ", err.status);
-        if (err.error && err.error.errors) {
-            console.error("Validation details: ", err.error.errors);
+        if (err.error?.errors?.[0]?.message) {
+            this.errorMessage.set(err.error.errors[0].message);
+        } else {
+            this.errorMessage.set("Invalid email or password. Please try again!");
         }
       }
     })
