@@ -3,6 +3,8 @@ package com.yrcode._blog.controllers;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.yrcode._blog.abstracts.PostService;
 import com.yrcode._blog.dtos.post.PostCreateDTO;
 import com.yrcode._blog.dtos.post.PostDetailsDTO;
 import com.yrcode._blog.dtos.post.PostUpdateDTO;
@@ -25,15 +28,19 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/post")
 public class PostController {
     /* findAll - findOne - createOne - deleteOne - updateOne */
+    @Autowired
+    private PostService postService;
 
     @GetMapping("/all")
     public ResponseEntity<GlobalResponse<List<PostDetailsDTO>>> findAll() {
-        return null;
+        List<PostDetailsDTO> posts = postService.findAll();
+        return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(posts));
     }
 
     @GetMapping("/{postId}")
     public ResponseEntity<GlobalResponse<PostDetailsDTO>> findOne(@PathVariable UUID postId) {
-        return null;
+        PostDetailsDTO post = postService.findOne(postId);
+        return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(post));
     }
 
     @PutMapping("/update")
@@ -43,11 +50,13 @@ public class PostController {
 
     @PostMapping("/create")
     public ResponseEntity<GlobalResponse<PostDetailsDTO>> createOne(@RequestBody @Valid PostCreateDTO postData) {
-        return null;
+        PostDetailsDTO post = postService.createOne(postData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(post));
     }
 
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deleteOne(@PathVariable UUID postId) {
-        return null;
+        postService.deleteOne(postId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
