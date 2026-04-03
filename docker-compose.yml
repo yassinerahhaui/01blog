@@ -12,10 +12,23 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  minio-server:
+    image: minio/minio
+    container_name: minio-server
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=yassine_admin
+      - MINIO_ROOT_PASSWORD=SuperSecretPassword123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
   backend:
     build:
       context: ./backend
-      network: host # باش يفك ليك مشكل التحميل في Zone01
+      network: host 
     container_name: 01blog-backend
     ports:
       - "8080:8080"
@@ -24,8 +37,8 @@ services:
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=secret
     volumes:
-      - ./backend:/app # كيربط الكود ديالك مع الـ Container
-      - ~/.m2:/root/.m2 # كيشارك الـ Maven Cache باش ما يعاودش يتيليشارجي كلشي
+      - ./backend:/app 
+      - ~/.m2:/root/.m2 
     depends_on:
       - db
 
@@ -35,14 +48,15 @@ services:
       network: host
     container_name: 01blog-frontend
     ports:
-      - "4200:4200" # أو 4200 حسب الـ framework اللي خدام بيه
+      - "4200:4200"
     volumes:
       - ./frontend:/app
-      - /app/node_modules # باش ما يمسحش الـ modules اللي تدار ليهم install وسط الـ container
+      - /app/node_modules
     environment:
-      - CHOKIDAR_USEPOLLING=true # ضروري باش الـ Hot Reload يخدم وسط Docker
+      - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
 
 volumes:
   db_data:
+  minio_data:
