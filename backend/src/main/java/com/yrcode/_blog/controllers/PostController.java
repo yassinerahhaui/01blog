@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.yrcode._blog.abstracts.PostService;
 import com.yrcode._blog.dtos.post.PostCreateDTO;
@@ -23,10 +26,10 @@ import com.yrcode._blog.shared.GlobalResponse;
 
 import jakarta.validation.Valid;
 
-
 @Controller
 @RequestMapping("/api/post")
 public class PostController {
+
     /* findAll - findOne - createOne - deleteOne - updateOne */
     @Autowired
     private PostService postService;
@@ -48,9 +51,12 @@ public class PostController {
         return null;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<GlobalResponse<PostDetailsDTO>> createOne(@RequestBody @Valid PostCreateDTO postData) {
-        PostDetailsDTO post = postService.createOne(postData);
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GlobalResponse<PostDetailsDTO>> createOne(
+            @RequestPart("data") @Valid PostCreateDTO postData,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        PostDetailsDTO post = postService.createOne(postData, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(post));
     }
 
