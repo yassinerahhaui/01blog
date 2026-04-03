@@ -16,7 +16,7 @@ public record PostCreateDTO(
     String title,
 
     @NotBlank(message = "Post content cannot be empty.")
-    @Size(min = 10, max = 500, message = "Content length must be between 10 and 500 characters.")
+    @Size(max = 50000, message = "Post content is too long! (Max 50,000 characters)")
     String content,
     
     @URL(message = "The media URL must be a valid and properly formatted link.")
