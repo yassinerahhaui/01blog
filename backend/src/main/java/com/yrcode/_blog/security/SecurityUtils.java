@@ -24,4 +24,9 @@ public class SecurityUtils {
         throw CustomResponseException.Unauthorized("you don't have permission!");
     }
 
+    public boolean isOwner(UUID id) {
+        UUID currentUserId = getCurrentUserId();
+        return id == currentUserId;
+    }
+
 }
