@@ -34,6 +34,13 @@ public class JwtHelper {
 
     // Core method that builds and signs the JWT token
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        String role = "USER_ROLE";
+
+        if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
+            role = userDetails.getAuthorities().iterator().next().getAuthority();
+        }
+
+        extraClaims.put("role", role);
         return Jwts
                 .builder()
                 .setClaims(extraClaims) // Add any extra data (claims) here
