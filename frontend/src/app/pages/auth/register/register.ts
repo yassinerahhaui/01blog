@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { Auth } from '../../../core/services/auth';
+import { Auth } from '../../../core/services/auth/auth';
 import { RegisterRequest } from '../../../core/models/register-request';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
