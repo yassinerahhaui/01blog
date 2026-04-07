@@ -36,7 +36,7 @@ public class PostEntity extends AbstractEntity {
     @Column(nullable=false,columnDefinition="TEXT")
     private String content;
     
-    @Column(nullable=true)
+    @Column(columnDefinition = "TEXT",nullable=true)
     private String mediaUrl;
     
     @Enumerated(EnumType.STRING)
