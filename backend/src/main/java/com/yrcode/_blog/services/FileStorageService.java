@@ -2,6 +2,7 @@ package com.yrcode._blog.services;
 
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 
 import org.apache.tika.Tika; // Added Tika import
 
@@ -19,23 +20,30 @@ import com.yrcode._blog.shared.CustomResponseException;
 
 @Service
 public class FileStorageService {
+
     @Autowired
     private MinioClient minioClient;
 
     @Value("${minio.bucket-name}")
     private String bucketName;
 
-    @Value("${minio.url}")
-    private String minioUrl;
+    // @Value("${minio.url}")
+    // private String minioUrl;
+
+    @Value("${minio.public-url:http://localhost:9000}")
+    private String minioPublicUrl;
 
     // List of allowed MIME types for security purposes
     private final List<String> ALLOWED_CONTENT_TYPES = Arrays.asList(
             "image/jpeg",
             "image/png",
+            "image/jpg",
             "image/gif",
             "image/webp",
             "video/mp4",
-            "video/webm"
+            "video/webm",
+            "application/x-matroska",
+            "video/x-matroska"
     );
 
     @SuppressWarnings("UseSpecificCatch")
@@ -44,7 +52,7 @@ public class FileStorageService {
             // --- SECURITY CHECK WITH APACHE TIKA ---
             // Initialize Tika to inspect the actual file content
             Tika tika = new Tika();
-            
+
             // Detect the real content type based on the file's magic bytes, not its extension
             String realContentType = tika.detect(file.getInputStream());
 
@@ -69,13 +77,38 @@ public class FileStorageService {
             );
 
             // Return the public URL so it can be saved in the database
-            return minioUrl + "/" + bucketName + "/" + fileName;
+            return minioPublicUrl + "/" + bucketName + "/" + fileName;
 
         } catch (IllegalArgumentException e) {
             // Re-throw the validation exception so the controller can return a 400 Bad Request
             throw CustomResponseException.BadRequest("invalid file!");
         } catch (Exception e) {
             throw new RuntimeException("Failed to upload file to MinIO: " + e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("UseSpecificCatch")
+    public void deleteFile(String fileUrl) {
+        if (fileUrl == null || fileUrl.isEmpty()) {
+            return;
+        }
+
+        try {
+            String prefix = minioPublicUrl + "/" + bucketName + "/";
+
+            if (fileUrl.startsWith(prefix)) {
+                String fileName = fileUrl.substring(prefix.length());
+
+                minioClient.removeObject(
+                        RemoveObjectArgs.builder()
+                                .bucket(bucketName)
+                                .object(fileName)
+                                .build()
+                );
+                System.out.println("✅ Orphaned file deleted successfully from MinIO!");
+            }
+        } catch (Exception e) {
+            System.err.println("Warning: Failed to delete orphaned file from MinIO: " + e.getMessage());
         }
     }
 }
