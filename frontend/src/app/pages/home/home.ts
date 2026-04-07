@@ -22,6 +22,8 @@ export class Home implements OnInit {
       next: (response)=> {
         if (response.status == "success") {
           this.posts.set(response.data);
+          console.log(this.posts());
+
         }
         this.isLoading.set(false);
       },
