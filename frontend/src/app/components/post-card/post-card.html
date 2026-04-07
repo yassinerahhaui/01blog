@@ -1,10 +1,23 @@
-<div class="card" style="width: 18rem;">
-  <img src="..." class="card-img-top" alt="...">
-  <div class="card-body">
-    <h5 class="card-title">Card title</h5>
-    <p class="card-text">
-      {{ post().content | slice:0:50 }}
+<div class="card shadow-sm h-100">
 
+  @if (post().mediaType === "IMAGE") {
+  <img [src]="post().mediaUrl" class="card-img-top object-fit-cover" height="250" alt="Post Image" />
+  }
+
+  @else if (post().mediaType === "VIDEO") {
+  <video controls class="card-img-top bg-dark object-fit-contain" height="250">
+    <source [src]="post().mediaUrl" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  }
+
+  <div class="card-body">
+    <h5 class="card-title fw-bold" [title]="post().title">
+      {{ post().title | slice:0:20}}
+      {{ post().title.length > 25 ? '...' : '' }}
+    </h5>
+    <p class="card-text text-muted">
+      {{ post().content | slice:0:50 }}
       {{ post().content.length > 50 ? '...' : '' }}
     </p>
   </div>

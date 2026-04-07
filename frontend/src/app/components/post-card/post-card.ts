@@ -12,4 +12,5 @@ import { CommonModule } from '@angular/common';
 export class PostCard {
 
   post = input.required<Post>();
+
 }
