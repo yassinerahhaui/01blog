@@ -1,0 +1,68 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-body p-4 p-md-5">
+          <h2 class="fw-bold mb-4 text-dark">Create New Post ✍️</h2>
+
+          <form (ngSubmit)="onSubmit()">
+
+            <div class="mb-4">
+              <label class="form-label fw-bold text-secondary">
+                Post Title <span class="text-danger">*</span>
+              </label>
+              <input type="text" class="form-control form-control-lg bg-light border-0"
+                     name="title" [ngModel]="title()" (ngModelChange)="title.set($event)"
+                     placeholder="Enter an engaging title..." required>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-bold text-secondary">
+                Content <span class="text-danger">*</span>
+              </label>
+              <textarea class="form-control bg-light border-0" rows="10"
+                        name="content" [ngModel]="content()" (ngModelChange)="content.set($event)"
+                        placeholder="Write your amazing content here (Markdown supported)..." required></textarea>
+            </div>
+
+            <hr class="my-4 text-muted opacity-25">
+
+            <h5 class="fw-bold text-secondary mb-3">
+              Attach Media <span class="text-muted fs-6 fw-normal">(Optional) 📸</span>
+            </h5>
+
+            <div class="row bg-light p-3 rounded-3 border-0 mb-4 align-items-center">
+
+              <div class="mb-3 mb-md-0" [class.border-end]="true">
+                <label class="form-label fw-bold text-dark">Upload File (MinIO)</label>
+                <input type="file" class="form-control border-0 shadow-sm"
+                       (change)="onFileSelected($event)"
+                       accept="image/*,video/*">
+                <small class="text-muted d-block mt-2">Select an image or video from your device.</small>
+              </div>
+
+            </div>
+
+            <div class="d-block mt-4">
+              <button type="submit" class="btn btn-primary w-100 px-5 py-3 fw-bold rounded-pill shadow-sm"
+                      [disabled]="isSubmitting() || !title() || !content()">
+
+                @if (isSubmitting()) {
+                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Publishing...
+                } @else {
+                  Publish Post 🚀
+                }
+
+              </button>
+            </div>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
