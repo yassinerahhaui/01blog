@@ -15,6 +15,6 @@ export class Posts {
     return this.http.get<ApiResponse<Post[]>>(`${this.apiUrl}/post/all`);
   }
   createPost(formData: FormData): Observable<any> {
-    return this.http.post(this.apiUrl, formData);
+    return this.http.post(`${this.apiUrl}/post/create`, formData);
   }
 }
