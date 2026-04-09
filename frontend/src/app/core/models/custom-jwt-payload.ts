@@ -3,4 +3,5 @@ export interface CustomJwtPayload {
   role: string;
   exp: number;
   iat: number;
+  userId: string;
 }
