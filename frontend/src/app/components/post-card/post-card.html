@@ -1,4 +1,5 @@
-<div class="card shadow-sm h-100">
+<div class="card shadow-sm h-100 position-relative">
+
 
   @if (post().mediaType === "IMAGE") {
   <img [src]="post().mediaUrl" class="card-img-top object-fit-cover" height="250" alt="Post Image" />
@@ -10,7 +11,17 @@
     Your browser does not support the video tag.
   </video>
   }
-
+  <div class="dropdown dropdown-style">
+    <button class="btn rounded-pill bg-white shadow-sm border toggle-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="fa-solid fa-ellipsis-vertical shadow-sm"></i>
+    </button>
+    <ul class="dropdown-menu">
+      @if (post().userId === currentUser()?.userId) {
+        <li><a class="dropdown-item" href="#">Edit</a></li>
+      }
+      <li><a class="dropdown-item" href="#">Report</a></li>
+    </ul>
+  </div>
   <div class="card-body">
     <h5 class="card-title fw-bold" [title]="post().title">
       {{ post().title | slice:0:20}}
