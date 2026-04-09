@@ -75,14 +75,13 @@ public class AuthService implements UserDetailsService {
     }
 
     public String login(UserLoginDTO user) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(user.username(), user.password())
-        );
-
         UserEntity account = userRepo.findOneByUsername(user.username())
                 .or(() -> userRepo.findOneByEmail(user.username()))
                 .orElseThrow(() -> CustomResponseException.Unauthorized("Bad credentials!"));
 
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(user.username(), user.password())
+        );
         Map<String,Object> customClaims = new HashMap<>();
         customClaims.put("userId", account.getId());
         return jwtHelper.generateToken(customClaims,account);
