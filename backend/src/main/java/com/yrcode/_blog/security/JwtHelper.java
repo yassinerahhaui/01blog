@@ -6,6 +6,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -16,8 +17,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.yrcode._blog.entities.UserEntity;
+
 @Component
 public class JwtHelper {
+
+    @Autowired
 
     @Value("${jwt.secret}")
     private String SECRET_KEY;
@@ -35,12 +40,17 @@ public class JwtHelper {
     // Core method that builds and signs the JWT token
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         String role = "USER_ROLE";
+        
 
         if (userDetails.getAuthorities() != null && !userDetails.getAuthorities().isEmpty()) {
             role = userDetails.getAuthorities().iterator().next().getAuthority();
         }
-
         extraClaims.put("role", role);
+
+        if (userDetails instanceof UserEntity user) {
+            extraClaims.put("userId", user.getId());
+        }
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims) // Add any extra data (claims) here
