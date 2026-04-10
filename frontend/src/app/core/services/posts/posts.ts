@@ -17,4 +17,8 @@ export class Posts {
   createPost(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/post/create`, formData);
   }
+
+  getMyPosts(page: number = 0): Observable<ApiResponse<Post[]>> {
+    return this.http.get<ApiResponse<Post[]>>(`${this.apiUrl}/profile/posts?page=${page}`);
+  }
 }
