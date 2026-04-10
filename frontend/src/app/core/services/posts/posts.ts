@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Post } from '../../models/post';
+import { SliceResponse } from '../../models/slice-response';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +19,7 @@ export class Posts {
     return this.http.post(`${this.apiUrl}/post/create`, formData);
   }
 
-  getMyPosts(page: number = 0): Observable<ApiResponse<Post[]>> {
-    return this.http.get<ApiResponse<Post[]>>(`${this.apiUrl}/profile/posts?page=${page}`);
+  getMyPosts(page: number = 0): Observable<ApiResponse<SliceResponse<Post[]>>> {
+    return this.http.get<ApiResponse<SliceResponse<Post[]>>>(`${this.apiUrl}/profile/posts?page=${page}`);
   }
 }
