@@ -12,9 +12,6 @@ import java.util.UUID;
 
 
 public interface PostRepo extends JpaRepository<PostEntity, UUID> {
-
-    // مسحنا الميثودات القدام وخلينا غير هادي لي خدامة بـ @Query
     @Query("SELECT p FROM PostEntity p WHERE p.userId = :userId ORDER BY p.createdAt DESC, p.lastUpdate DESC")
     Slice<PostEntity> findPostsByUserOrdered(@Param("userId") UUID userId, Pageable pageable);
-    
 }
