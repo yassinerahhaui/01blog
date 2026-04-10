@@ -19,7 +19,7 @@ export class Posts {
     return this.http.post(`${this.apiUrl}/post/create`, formData);
   }
 
-  getMyPosts(page: number = 0): Observable<ApiResponse<SliceResponse<Post[]>>> {
-    return this.http.get<ApiResponse<SliceResponse<Post[]>>>(`${this.apiUrl}/profile/posts?page=${page}`);
+  getMyPosts(page: number = 0): Observable<ApiResponse<SliceResponse<Post>>> {
+    return this.http.get<ApiResponse<SliceResponse<Post>>>(`${this.apiUrl}/profile/posts?page=${page}`);
   }
 }
