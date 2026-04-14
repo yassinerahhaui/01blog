@@ -4,13 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Post } from '../../models/post';
 import { SliceResponse } from '../../models/slice-response';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Posts {
   private http = inject(HttpClient);
-  private apiUrl = `http://localhost:8080/api`;
+  private apiUrl = `${environment.apiUrl}`;
 
   getAll(): Observable<ApiResponse<Post[]>> {
     return this.http.get<ApiResponse<Post[]>>(`${this.apiUrl}/post/all`);

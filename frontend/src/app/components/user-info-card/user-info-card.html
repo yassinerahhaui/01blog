@@ -1,0 +1,74 @@
+@if (isLoading()) {
+<div class="text-center my-5">
+  <div class="spinner-border text-primary" role="status"></div>
+</div>
+} @else if (info()) {
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+  <div class="card-body text-center pt-5 pb-4">
+
+    <div class="position-relative d-inline-block mb-3">
+      <img [src]="'https://ui-avatars.com/api/?name=' + info()?.username + '&background=random'" alt="Profile Picture"
+        class="rounded-circle shadow-sm object-fit-cover border border-3 border-white" width="130" height="130">
+    </div>
+
+    <h4 class="fw-bold mb-1">{{ info()?.username }}</h4>
+    <p class="text-muted mb-3">{{ info()?.email }}</p>
+
+    <div class="d-flex justify-content-center gap-3 mb-4">
+      <button (click)="openFollowList('followers')" data-bs-toggle="modal" data-bs-target="#followModal"
+        class="btn btn-light border rounded-pill px-4 shadow-sm hover-shadow transition">
+        <span class="fw-bold text-dark">120</span>
+        <span class="text-muted ms-1">Followers</span>
+      </button>
+
+      <button (click)="openFollowList('following')" data-bs-toggle="modal" data-bs-target="#followModal"
+        class="btn btn-light border rounded-pill px-4 shadow-sm hover-shadow transition">
+        <span class="fw-bold text-dark">85</span>
+        <span class="text-muted ms-1">Following</span>
+      </button>
+    </div>
+
+  </div>
+</div>
+}
+
+<div class="modal fade" id="followModal" tabindex="-1" aria-labelledby="followModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content rounded-4 border-0 shadow">
+
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-bold" id="followModalLabel">
+          {{ activeTab() === 'followers' ? 'Followers' : 'Following' }}
+        </h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body px-4 pb-4">
+        <ul class="list-group list-group-flush">
+
+          @for (user of usersList(); track user.id) {
+            <li class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-3">
+              <div class="d-flex align-items-center cursor-pointer">
+                <img [src]="user.profilePictureUrl || 'https://ui-avatars.com/api/?name=' + user.username + '&background=random'"
+                     class="rounded-circle me-3 border shadow-sm object-fit-cover"
+                     width="45"
+                     height="45">
+                <span class="fw-bold text-dark">{{ user.username }}</span>
+              </div>
+
+              <button class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold transition" data-bs-dismiss="modal">
+                View
+              </button>
+            </li>
+          } @empty {
+            <div class="text-center text-muted my-4">
+              <p class="mb-0">No {{ activeTab() }} yet.</p>
+            </div>
+          }
+
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>

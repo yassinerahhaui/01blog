@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
 
 import com.yrcode._blog.abstracts.ProfileService;
 import com.yrcode._blog.dtos.post.PostDetailsDTO;
 import com.yrcode._blog.entities.PostEntity;
 import com.yrcode._blog.repositories.PostRepo;
 
+@Service
 public class ProfileServiceImpl implements ProfileService {
     @Autowired
     private PostRepo postRepo;

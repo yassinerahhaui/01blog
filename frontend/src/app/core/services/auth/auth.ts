@@ -10,13 +10,14 @@ import { Observable, tap } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { CustomJwtPayload } from '../../models/custom-jwt-payload';
 import { jwtDecode } from 'jwt-decode';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Auth {
   private http = inject(HttpClient);
-  private apiUrl = `http://localhost:8080/api/auth`;
+  private apiUrl = `${environment.apiUrl}/auth`;
   private platformId = inject(PLATFORM_ID);
   currentUser = signal<CustomJwtPayload | null>(null);
 

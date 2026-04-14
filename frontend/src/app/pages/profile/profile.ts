@@ -3,10 +3,13 @@ import { Posts } from '../../core/services/posts/posts';
 import { Post } from '../../core/models/post';
 import { ApiResponse } from '../../core/models/api-response';
 import { SliceResponse } from '../../core/models/slice-response';
+import { CommonModule } from '@angular/common';
+import { PostCard } from '../../components/post-card/post-card';
+import { UserInfoCard } from '../../components/user-info-card/user-info-card';
 
 @Component({
   selector: 'app-profile',
-  imports: [],
+  imports: [CommonModule, PostCard, UserInfoCard],
   templateUrl: './profile.html',
   styleUrl: './profile.scss',
 })

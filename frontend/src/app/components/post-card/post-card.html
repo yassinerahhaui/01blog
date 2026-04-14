@@ -18,8 +18,9 @@
     <ul class="dropdown-menu">
       @if (post().userId === currentUser()?.userId) {
         <li><a class="dropdown-item" href="#">Edit</a></li>
+      } @else {
+        <li><a class="dropdown-item" href="#">Report</a></li>
       }
-      <li><a class="dropdown-item" href="#">Report</a></li>
     </ul>
   </div>
   <div class="card-body">

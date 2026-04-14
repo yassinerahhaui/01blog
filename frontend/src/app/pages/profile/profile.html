@@ -1,1 +1,38 @@
-<p>profile works!</p>
+<div class="container mt-5">
+  <div class="">
+    <div class="col-12 mb-4 text-center">
+      <app-user-info-card></app-user-info-card>
+      <hr>
+    </div>
+
+    <div class="row">
+      @for (post of posts(); track post.id) {
+        <div class="col-md-6 col-lg-4 col-xxl-3 mb-4">
+          <app-post-card
+            [post]="post">
+          </app-post-card>
+        </div>
+      } @empty {
+        @if (!isLoading()) {
+          <div class="text-center text-muted my-5">
+            <p>You haven't posted anything yet. Time to share your first blog! ✍️</p>
+          </div>
+        }
+      }
+
+      @if (isLoading()) {
+        <div class="text-center my-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      }
+
+      @if (!hasMore() && posts().length > 0) {
+        <div class="text-center text-muted my-4">
+          <p>You've reached the end of your posts! 🎉</p>
+        </div>
+      }
+    </div>
+  </div>
+</div>

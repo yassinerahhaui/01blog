@@ -12,6 +12,6 @@ import java.util.UUID;
 
 
 public interface PostRepo extends JpaRepository<PostEntity, UUID> {
-    @Query("SELECT p FROM PostEntity p WHERE p.userId = :userId ORDER BY p.createdAt DESC, p.lastUpdate DESC")
+    @Query("SELECT p FROM PostEntity p WHERE p.userId.id = :userId ORDER BY p.createdAt DESC, p.lastUpdate DESC")
     Slice<PostEntity> findPostsByUserOrdered(@Param("userId") UUID userId, Pageable pageable);
 }
