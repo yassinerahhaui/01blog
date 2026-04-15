@@ -5,4 +5,7 @@ export interface UserInfo {
   avatarUrl: string | null;
   role: string;
   access: string;
+  followers: number;
+  following: number;
+  isFollowedByMe: boolean;
 }
