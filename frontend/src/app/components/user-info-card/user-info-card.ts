@@ -4,11 +4,12 @@ import { Profile } from '../../core/services/profile/profile';
 import { UserInfo } from '../../core/models/user-info';
 import { ApiResponse } from '../../core/models/api-response';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-user-info-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './user-info-card.html',
   styleUrl: './user-info-card.scss',
 })

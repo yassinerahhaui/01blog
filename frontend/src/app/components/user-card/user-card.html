@@ -10,7 +10,7 @@
     <!-- <span class="badge bg-dark p-1  mb-4" >{{user()?.role | lowercase}}</span> -->
 
     <button routerLink="post/create" class="btn btn-primary w-100 fw-bold mb-2 py-2">
-      Create New Post
+      <i class="fa-solid fa-pen me-2"></i> Create Post
     </button>
     @if (user()?.role === "ADMIN") {
       <button routerLink="/dashboard" class="btn btn-light border w-100 fw-bold py-2">
