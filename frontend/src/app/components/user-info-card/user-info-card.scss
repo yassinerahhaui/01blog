@@ -1,54 +1,41 @@
-// General card styles and hover effects
-.card {
-  background: linear-gradient(145deg, #ffffff, #f8f9fc);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+// Smooth hover animation for the whole card
+.post-card {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important; // Stronger shadow on hover
   }
 }
 
-// Profile avatar interactive styling
-img.rounded-circle {
-  transition: transform 0.3s ease, border-color 0.3s ease;
-  background-color: #fff;
+// Ensure the media corners match the rounded-4 card border
+.media-container {
+  overflow: hidden;
+  border-top-left-radius: var(--bs-border-radius-xl);
+  border-top-right-radius: var(--bs-border-radius-xl);
 
-  &:hover {
-    transform: scale(1.05);
-    border-color: #0d6efd !important; // Primary blue color on hover
+  img, video {
+    width: 100%;
   }
 }
 
-// Typography adjustments for a premium look
-h4 {
-  color: #2b2d42;
-  letter-spacing: -0.5px;
-}
-
-p.text-muted {
-  font-size: 0.95rem;
-  letter-spacing: 0.2px;
-}
-
-// Smooth transitions utility
-.transition {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-// Custom interactive buttons (Followers/Following)
-.hover-shadow {
-  background-color: #ffffff;
+// Interactive hover effect for Like and Comment buttons
+.action-btn {
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
 
   &:hover {
-    background-color: #f1f3f5;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1) !important;
-    border-color: #dee2e6 !important;
-
-    // Highlight the numbers on button hover
-    .text-dark {
-      color: #0d6efd !important;
-    }
+    background-color: #e9ecef !important;
+    transform: scale(1.05); // Pop effect
   }
+}
+
+// Force content to be 3 lines max if needed (Optional safety net)
+.content-text {
+  min-height: 40px; // Keeps cards aligned even if text is short
+}
+
+// Clean input focus for the comment box inside the modal
+.form-control:focus {
+  box-shadow: inset 0 0 0 1px rgba(13, 110, 253, 0.2); // Light blue inner ring
 }
