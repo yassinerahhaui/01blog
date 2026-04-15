@@ -1,36 +1,143 @@
-<div class="card shadow-sm h-100 position-relative">
+<div class="card border-0 shadow-sm rounded-4 h-100 post-card bg-white">
 
+  <div class="position-relative media-container">
 
-  @if (post().mediaType === "IMAGE") {
-  <img [src]="post().mediaUrl" class="card-img-top object-fit-cover" height="250" alt="Post Image" />
-  }
+    @if (post().mediaType === "IMAGE") {
+    <img [src]="post().mediaUrl" class="card-img-top object-fit-cover" height="250" alt="Post Image" />
+    }
+    @else if (post().mediaType === "VIDEO") {
+    <video controls class="card-img-top bg-dark object-fit-cover" height="250">
+      <source [src]="post().mediaUrl" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    }
 
-  @else if (post().mediaType === "VIDEO") {
-  <video controls class="card-img-top bg-dark object-fit-contain" height="250">
-    <source [src]="post().mediaUrl" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-  }
-  <div class="dropdown dropdown-style">
-    <button class="btn rounded-pill bg-white shadow-sm border toggle-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-      <i class="fa-solid fa-ellipsis-vertical shadow-sm"></i>
-    </button>
-    <ul class="dropdown-menu">
-      @if (post().userId === currentUser()?.userId) {
-        <li><a class="dropdown-item" href="#">Edit</a></li>
-      } @else {
-        <li><a class="dropdown-item" href="#">Report</a></li>
-      }
-    </ul>
+    <div class="dropdown position-absolute top-0 end-0 m-3">
+      <button
+        class="btn btn-light btn-sm rounded-circle shadow border-0 d-flex justify-content-center align-items-center"
+        type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 35px; height: 35px;">
+        <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+      </button>
+
+      <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
+        @if (post().userId === currentUser()?.userId) {
+        <li>
+          <a class="dropdown-item fw-semibold text-primary" href="#">
+            <i class="fa-solid fa-pen-to-square me-2"></i> Edit
+          </a>
+        </li>
+        <li>
+          <a class="dropdown-item fw-semibold text-danger" href="#">
+            <i class="fa-solid fa-trash me-2"></i> Delete
+          </a>
+        </li>
+        }
+        @else {
+        <li>
+          <a class="dropdown-item fw-semibold text-danger" href="#">
+            <i class="fa-solid fa-flag me-2"></i> Report
+          </a>
+        </li>
+        }
+      </ul>
+    </div>
   </div>
-  <div class="card-body">
-    <h5 class="card-title fw-bold" [title]="post().title">
-      {{ post().title | slice:0:20}}
-      {{ post().title.length > 25 ? '...' : '' }}
+
+  <div class="card-body px-4 pt-4 pb-2 d-flex flex-column">
+    <h5 class="card-title fw-bold text-dark mb-2 text-truncate" [title]="post().title">
+      {{ post().title }}
     </h5>
-    <p class="card-text text-muted">
-      {{ post().content | slice:0:50 }}
-      {{ post().content.length > 50 ? '...' : '' }}
+
+    <p class="card-text text-muted small mb-0 flex-grow-1">
+      {{ post().content.length > 100
+      ? (post().content | slice:0:100) + '...'
+      : post().content
+      }}
     </p>
+  </div>
+
+  <div class="card-footer bg-transparent border-top-0 px-4 pb-4 pt-2 mt-auto">
+    <div class="d-flex justify-content-between align-items-center">
+
+      <button (click)="onToggleLike()"
+        class="btn btn-light rounded-pill px-3 py-2 action-btn text-muted fw-bold border-0 shadow-sm transition">
+        <i class="me-1 fs-5 align-middle"
+          [ngClass]="isLiked() ? 'fa-solid fa-heart text-danger animate__animated animate__heartBeat' : 'fa-regular fa-heart text-danger'">
+        </i>
+        {{ likesCount() }}
+      </button>
+
+      <button (click)="loadComments()"
+        class="btn btn-light rounded-pill px-3 py-2 action-btn text-muted fw-bold border-0 shadow-sm"
+        data-bs-toggle="modal" [attr.data-bs-target]="'#commentModal-' + post().id">
+        <i class="fa-regular fa-comment text-primary me-1 fs-5 align-middle"></i> {{ post().commentsCount }}
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" [id]="'commentModal-' + post().id" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-bold">Comments</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body px-4">
+
+        @if (isLoadingComments()) {
+        <div class="text-center my-4">
+          <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+          <p class="text-muted mt-2 small">Loading comments...</p>
+        </div>
+        } @else {
+
+        @for (comment of comments(); track comment.id) {
+        <div class="d-flex mb-3 animate__animated animate__fadeIn">
+
+          <img [src]="'https://ui-avatars.com/api/?name=' + comment.username + '&background=random'"
+            class="rounded-circle me-3 border shadow-sm object-fit-cover" width="45" height="45" alt="Avatar">
+
+          <div class="bg-light rounded-4 p-3 flex-grow-1">
+            <h6 class="fw-bold mb-1 small text-dark">{{ comment.username }}</h6>
+            <p class="mb-0 small text-muted">{{ comment.content }}</p>
+          </div>
+        </div>
+        } @empty {
+
+        <div class="text-center text-muted my-4">
+          <i class="fa-regular fa-comments fs-1 mb-2 opacity-50"></i>
+          <p class="mb-0 small">No comments yet. Be the first to share your thoughts!</p>
+        </div>
+        }
+
+        }
+      </div>
+
+      <div class="modal-footer border-top-0 pt-2 pb-4 px-4 bg-white rounded-bottom-4">
+        <div class="input-group">
+
+          <input type="text" class="form-control rounded-pill bg-light border-0 shadow-none ps-4 py-2"
+            placeholder="Write a comment..." [value]="newCommentText()" (input)="updateCommentText($event)"
+            (keyup.enter)="submitComment()" [disabled]="isSendingComment()">
+
+          <button (click)="submitComment()" [disabled]="!newCommentText().trim() || isSendingComment()"
+            class="btn btn-primary rounded-circle ms-2 shadow-sm d-flex justify-content-center align-items-center"
+            type="button" style="width: 45px; height: 45px;">
+
+            @if (isSendingComment()) {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            } @else {
+            <i class="fa-solid fa-paper-plane"></i>
+            }
+          </button>
+
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
