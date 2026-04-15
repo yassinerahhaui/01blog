@@ -1,12 +1,11 @@
-package com.yrcode._blog.dtos.user;
+package com.yrcode._blog.dtos.comment;
 
 import java.util.UUID;
-
 import lombok.Builder;
 
 @Builder
-public record FollowerDTO(
+public record CommentDTO(
     UUID id,
-    String avatar,
+    String content,
     String username
 ) {}

@@ -1,5 +1,6 @@
 package com.yrcode._blog.dtos.post;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.yrcode._blog.enums.MediaType;
@@ -14,5 +15,9 @@ public record PostDetailsDTO(
     String content,
     String mediaUrl,
     MediaType mediaType,
-    UUID userId
+    UUID userId,
+    Integer commentsCount,
+    Integer likesCount,
+    boolean isLikedByMe,
+    LocalDateTime createdAt
 ) {}

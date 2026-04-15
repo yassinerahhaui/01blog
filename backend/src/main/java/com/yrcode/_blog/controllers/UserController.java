@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.yrcode._blog.abstracts.FollowService;
 import com.yrcode._blog.abstracts.UserService;
 import com.yrcode._blog.dtos.user.UserDetailsDTO;
 import com.yrcode._blog.dtos.user.UserUpdateDTO;
@@ -29,6 +31,8 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private FollowService followService;
 
     @GetMapping("/all")
     public ResponseEntity<GlobalResponse<List<UserDetailsDTO>>> findAll() {
@@ -52,6 +56,12 @@ public class UserController {
     public ResponseEntity<GlobalResponse<UserDetailsDTO>> updateOne(@RequestBody @Valid UserUpdateDTO data) {
         UserDetailsDTO user = userService.updateOne(data);
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(user));
+    }
+
+    @PostMapping("/{targetUserId}/follow")
+    public ResponseEntity<GlobalResponse<Boolean>> toggleFollow(@PathVariable UUID targetUserId) {
+        Boolean result = followService.toggleFollow(targetUserId);
+        return ResponseEntity.ok(new GlobalResponse<>(result));
     }
 }
 

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.hibernate.annotations.Formula;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -59,16 +60,11 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     private Access access = Access.ENABLED;
 
     @ManyToMany
-    @JoinTable(
-            name = "user_followers",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "follower_id")
-    )
+    @JoinTable(name = "user_followers", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "follower_id"))
     @lombok.Builder.Default
     private Set<UserEntity> followers = new HashSet<>();
 
-    
-    @ManyToMany(mappedBy = "followers") 
+    @ManyToMany(mappedBy = "followers")
     @lombok.Builder.Default
     private Set<UserEntity> following = new HashSet<>();
 
@@ -76,4 +72,10 @@ public class UserEntity extends AbstractEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
+
+    @Formula("(SELECT COUNT(f.id) FROM follows f WHERE f.following_id = id)")
+    private Integer followersCount;
+
+    @Formula("(SELECT COUNT(f.id) FROM follows f WHERE f.follower_id = id)")
+    private Integer followingCount;
 }

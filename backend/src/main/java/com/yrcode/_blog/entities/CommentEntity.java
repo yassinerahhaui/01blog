@@ -28,23 +28,26 @@ public class CommentEntity extends AbstractEntity {
     @ManyToOne(fetch=FetchType.LAZY, optional=false)
     @JoinColumn(nullable=false,name="user_id")
     @OnDelete(action=OnDeleteAction.CASCADE)
-    private UserEntity userId;
+    private UserEntity user;
     
     @ManyToOne(fetch=FetchType.LAZY,optional=false)
     @JoinColumn(nullable=false,name="post_id")
     @OnDelete(action=OnDeleteAction.CASCADE)
-    private PostEntity postId;
+    private PostEntity post;
     
-    @Column(nullable=false)
+    @Column(nullable=false, length=500)
     private String content;
 
     public UUID getUserId() {
-        return userId.getId();
+        return user.getId();
     }
 
+    public String getUsername() {
+        return user.getUsername();
+    }
 
     public UUID getPostId() {
-        return postId.getId();
+        return post.getId();
     }
 
 }

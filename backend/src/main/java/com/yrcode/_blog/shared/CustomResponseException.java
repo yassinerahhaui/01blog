@@ -15,7 +15,7 @@ public class CustomResponseException extends RuntimeException {
     }
 
     // 1. Not Found (404)
-    public static CustomResponseException ResourceNotFound(String message) {
+    public static CustomResponseException NotFound(String message) {
         return new CustomResponseException(404, message);
     }
 

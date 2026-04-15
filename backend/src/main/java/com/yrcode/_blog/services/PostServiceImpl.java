@@ -18,6 +18,7 @@ import com.yrcode._blog.entities.PostEntity;
 import com.yrcode._blog.entities.UserEntity;
 import com.yrcode._blog.enums.MediaType;
 import com.yrcode._blog.repositories.PostRepo;
+import com.yrcode._blog.repositories.ReactionRepo;
 import com.yrcode._blog.repositories.UserRepo;
 import com.yrcode._blog.security.SecurityUtils;
 import com.yrcode._blog.shared.CustomResponseException;
@@ -33,11 +34,15 @@ public class PostServiceImpl implements PostService {
     private UserRepo userRepo;
     @Autowired
     private FileStorageService fileStorageService;
+    @Autowired
+    private ReactionRepo reactionRepo;
 
     @Override
     public PostDetailsDTO findOne(UUID id) {
         PostEntity post = postRepo.findById(id)
                 .orElseThrow(() -> CustomResponseException.BadRequest("invalid post id!"));
+        UUID currentUserId = securityUtils.getCurrentUserId();
+        boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
         return PostDetailsDTO.builder()
                 .id(post.getId())
                 .title(post.getTitle())
@@ -45,21 +50,31 @@ public class PostServiceImpl implements PostService {
                 .mediaUrl(post.getMediaUrl())
                 .mediaType(post.getMediaType())
                 .userId(post.getUserId())
+                .commentsCount(post.getCommentsCount())
+                .likesCount(post.getLikesCount())
+                .isLikedByMe(isLiked)
                 .build();
     }
 
     @Override
     public List<PostDetailsDTO> findAll() {
         List<PostEntity> posts = postRepo.findAll();
+        UUID currentUserId = securityUtils.getCurrentUserId();
         return posts.stream()
-                .map(post -> PostDetailsDTO.builder()
-                .id(post.getId())
-                .title(post.getTitle())
-                .content(post.getContent())
-                .mediaUrl(post.getMediaUrl())
-                .mediaType(post.getMediaType())
-                .userId(post.getUserId())
-                .build()
+                .map(post -> {
+                    boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
+                    return PostDetailsDTO.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .mediaUrl(post.getMediaUrl())
+                    .mediaType(post.getMediaType())
+                    .userId(post.getUserId())
+                    .commentsCount(post.getCommentsCount())
+                    .likesCount(post.getLikesCount())
+                    .isLikedByMe(isLiked)
+                    .build();
+                }
                 ).collect(toList());
     }
 

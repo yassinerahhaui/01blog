@@ -11,51 +11,63 @@ import com.yrcode._blog.abstracts.UserService;
 import com.yrcode._blog.dtos.user.UserDetailsDTO;
 import com.yrcode._blog.dtos.user.UserUpdateDTO;
 import com.yrcode._blog.entities.UserEntity;
+import com.yrcode._blog.repositories.FollowRepo;
 import com.yrcode._blog.repositories.UserRepo;
+import com.yrcode._blog.security.SecurityUtils;
 import com.yrcode._blog.shared.CustomResponseException;
-
 
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
+    @Autowired
+    private FollowRepo followRepo;
+    @Autowired
+    private SecurityUtils securityUtils;
 
     @Override
-    public UserDetailsDTO findOne(UUID userId){
+    public UserDetailsDTO findOne(UUID userId) {
         UserEntity user = userRepo.findById(userId)
-            .orElseThrow(()-> CustomResponseException.BadRequest("invalid user id!"));
+                .orElseThrow(() -> CustomResponseException.NotFound("User not found!"));
+
+        UUID currentUserId = securityUtils.getCurrentUserId();
+
+        boolean isFollowedByMe = followRepo.existsByFollowerIdAndFollowingId(currentUserId, userId);
 
         return UserDetailsDTO.builder()
-            .id(user.getId())
-            .fullName(user.getFullName())
-            .username(user.getUsername())
-            .email(user.getEmail())
-            .avatarUrl(user.getAvatarUrl())
-            .role(user.getRole())
-            .access(user.getAccess())
-            .build();
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .avatarUrl(user.getAvatarUrl())
+                .role(user.getRole())
+                .access(user.getAccess())
+                .followers(user.getFollowersCount() != null ? user.getFollowersCount() : 0)
+                .following(user.getFollowingCount() != null ? user.getFollowingCount() : 0)
+                .isFollowedByMe(isFollowedByMe)
+                .build();
     }
 
     @Override
     public List<UserDetailsDTO> findAll() {
         List<UserEntity> users = userRepo.findAll();
         return users.stream()
-            .map(user -> UserDetailsDTO.builder()
-                    .id(user.getId())
-                    .fullName(user.getFullName())
-                    .username(user.getUsername())
-                    .email(user.getEmail())
-                    .avatarUrl(user.getAvatarUrl())
-                    .role(user.getRole())
-                    .access(user.getAccess())
-                    .build()
-                ).collect(toList());
+                .map(user -> UserDetailsDTO.builder()
+                        .id(user.getId())
+                        .fullName(user.getFullName())
+                        .username(user.getUsername())
+                        .email(user.getEmail())
+                        .avatarUrl(user.getAvatarUrl())
+                        .role(user.getRole())
+                        .access(user.getAccess())
+                        .build())
+                .collect(toList());
     }
 
     @Override
     public void deleteOne(UUID userId) {
         UserEntity user = userRepo.findById(userId)
-            .orElseThrow(()-> CustomResponseException.BadRequest("Invalid user id!"));
+                .orElseThrow(() -> CustomResponseException.BadRequest("Invalid user id!"));
         userRepo.deleteById(user.getId());
     }
 
@@ -63,8 +75,8 @@ public class UserServiceImpl implements UserService {
     public UserDetailsDTO updateOne(UserUpdateDTO data) {
         /* get existing user */
         UserEntity user = userRepo.findById(data.id())
-            .orElseThrow(()-> CustomResponseException.BadRequest("Invalid user id!"));
-        
+                .orElseThrow(() -> CustomResponseException.BadRequest("Invalid user id!"));
+
         /* check if email is already in use */
         if (userRepo.existsByEmailAndIdNot(data.email(), data.id())) {
             throw CustomResponseException.Conflict("This email is already taken!");
@@ -84,14 +96,13 @@ public class UserServiceImpl implements UserService {
 
         /* return user with new data */
         return UserDetailsDTO.builder()
-            .id(userSaved.getId())
-            .fullName(userSaved.getFullName())
-            .username(userSaved.getUsername())
-            .email(userSaved.getEmail())
-            .role(userSaved.getRole())
-            .access(userSaved.getAccess())
-            .build();
+                .id(userSaved.getId())
+                .fullName(userSaved.getFullName())
+                .username(userSaved.getUsername())
+                .email(userSaved.getEmail())
+                .role(userSaved.getRole())
+                .access(userSaved.getAccess())
+                .build();
     }
-    
-}
 
+}

@@ -2,6 +2,7 @@ package com.yrcode._blog.entities;
 
 import java.util.UUID;
 
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -22,7 +23,7 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
-@Table(name="posts")
+@Table(name = "posts")
 @Setter
 @Getter
 @SuperBuilder
@@ -30,26 +31,32 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class PostEntity extends AbstractEntity {
 
-    @Column(nullable=false)
+    @Column(nullable = false)
     private String title;
 
-    @Column(nullable=false,columnDefinition="TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
-    
-    @Column(columnDefinition = "TEXT",nullable=true)
+
+    @Column(columnDefinition = "TEXT", nullable = true)
     private String mediaUrl;
-    
+
     @Enumerated(EnumType.STRING)
     @lombok.Builder.Default
     private MediaType mediaType = MediaType.EMPTY;
-    
-    @ManyToOne(fetch=FetchType.LAZY, optional=false)
-    @JoinColumn(name="user_id",nullable=false)
-    @OnDelete(action=OnDeleteAction.CASCADE)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserEntity userId;
 
+    @Formula("(SELECT COUNT(c.id) FROM comments c WHERE c.post_id = id)")
+    private Integer commentsCount;
+
+    @Formula("(SELECT COUNT(r.id) FROM reactions r WHERE r.post_id = id)")
+    private Integer likesCount;
+
     public UUID getUserId() {
-        return  userId.getId();
+        return userId.getId();
     }
 
     public String getUsername() {
