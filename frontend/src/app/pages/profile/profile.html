@@ -1,38 +1,43 @@
 <div class="container mt-5">
-  <div class="">
-    <div class="col-12 mb-4 text-center">
-      <app-user-info-card></app-user-info-card>
+
+  <div class="d-block mb-5">
+    <app-user-info-card [userId]="profileOwnerId()"></app-user-info-card>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <h4 class="fw-bold">Posts</h4>
       <hr>
     </div>
-
-    <div class="row">
-      @for (post of posts(); track post.id) {
-        <div class="col-md-6 col-lg-4 col-xxl-3 mb-4">
-          <app-post-card
-            [post]="post">
-          </app-post-card>
-        </div>
-      } @empty {
-        @if (!isLoading()) {
-          <div class="text-center text-muted my-5">
-            <p>You haven't posted anything yet. Time to share your first blog! ✍️</p>
-          </div>
-        }
-      }
-
-      @if (isLoading()) {
-        <div class="text-center my-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-      }
-
-      @if (!hasMore() && posts().length > 0) {
-        <div class="text-center text-muted my-4">
-          <p>You've reached the end of your posts! 🎉</p>
-        </div>
-      }
-    </div>
   </div>
+
+  <div class="row">
+    @for (p of posts(); track p.id) {
+      <div class="col-xl-4 col-md-6 mb-4">
+        <app-post-card
+          [post]="p">
+        </app-post-card>
+      </div>
+    }
+    @if (!isLoading() && posts().length === 0) {
+      <div class="col-12 text-center text-muted my-5 p-5 bg-white rounded-4 shadow-sm">
+        <p class="mb-0 fs-5">No posts found for this profile yet. ✍️</p>
+      </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  }
+
+  @if (!hasMore() && posts().length > 0) {
+    <div class="text-center text-muted my-5">
+      <p>You've caught up on all posts! 🎉</p>
+    </div>
+  }
+
 </div>
