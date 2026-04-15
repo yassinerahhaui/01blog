@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  <div class="card-body px-4 pt-4 pb-2 d-flex flex-column">
+  <div class="card-body px-4 pt-4 pb-2 d-flex flex-column pointer" [routerLink]="['/post', post().id]">
     <h5 class="card-title fw-bold text-dark mb-2 text-truncate" [title]="post().title">
       {{ post().title }}
     </h5>

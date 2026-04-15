@@ -9,12 +9,14 @@ import { Profile } from './pages/profile/profile';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { adminGuard } from './core/guards/admin-guard';
 import { PostCreate } from './components/post-create/post-create';
+import { PostDetails } from './pages/post-details/post-details';
 
 export const routes: Routes = [
   { path: '', component: Home, canActivate: [authGuard] },
   { path: 'profile', component: Profile, canActivate: [authGuard] },
   { path: 'profile/:id', component: Profile, canActivate: [authGuard] },
   { path: 'post/create', component: PostCreate, canActivate: [authGuard] },
+  { path: 'post/:id', component: PostDetails, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, adminGuard] },
   { path: 'login', component: Login, canActivate: [notAuthGuard] },
   { path: 'register', component: Register, canActivate: [notAuthGuard] },

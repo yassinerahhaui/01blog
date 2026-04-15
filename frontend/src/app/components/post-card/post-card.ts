@@ -5,11 +5,12 @@ import { CommonModule } from '@angular/common';
 import { Auth } from '../../core/services/auth/auth';
 import { Posts } from '../../core/services/posts/posts';
 import { ApiResponse } from '../../core/models/api-response';
+import { RouterLink } from "@angular/router";
 
 @Component({
   selector: 'app-post-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './post-card.html',
   styleUrl: './post-card.scss',
 })
