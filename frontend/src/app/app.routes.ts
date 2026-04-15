@@ -13,6 +13,7 @@ import { PostCreate } from './components/post-create/post-create';
 export const routes: Routes = [
   { path: '', component: Home, canActivate: [authGuard] },
   { path: 'profile', component: Profile, canActivate: [authGuard] },
+  { path: 'profile/:id', component: Profile, canActivate: [authGuard] },
   { path: 'post/create', component: PostCreate, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, adminGuard] },
   { path: 'login', component: Login, canActivate: [notAuthGuard] },
