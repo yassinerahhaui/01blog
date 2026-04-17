@@ -7,6 +7,8 @@ import { SliceResponse } from '../../models/slice-response';
 import { environment } from '../../../../environments/environment';
 import { Comment } from '../../models/comment';
 import { Like } from '../../models/like';
+import { ReportRequest } from '../../models/report-request';
+import { ReportResponse } from '../../models/report-response';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +20,11 @@ export class Posts {
   getAll(): Observable<ApiResponse<Post[]>> {
     return this.http.get<ApiResponse<Post[]>>(`${this.apiUrl}/post/all`);
   }
+
+  getById(postId: string): Observable<ApiResponse<Post>> {
+    return this.http.get<ApiResponse<Post>>(`${this.apiUrl}/post/${postId}`);
+  }
+
   createPost(formData: FormData): Observable<any> {
     return this.http.post(`${this.apiUrl}/post/create`, formData);
   }
@@ -40,5 +47,13 @@ export class Posts {
 
   toggleLike(postId: string): Observable<ApiResponse<Like>> {
     return this.http.post<ApiResponse<Like>>(`${this.apiUrl}/post/${postId}/like`, {});
+  }
+
+  reportPost(postId: string, payload: ReportRequest): Observable<ApiResponse<ReportResponse>> {
+    return this.http.post<ApiResponse<ReportResponse>>(`${this.apiUrl}/post/${postId}/report`, payload);
+  }
+
+  updatePost(post: { id: string; title: string; content: string }): Observable<ApiResponse<Post>> {
+    return this.http.put<ApiResponse<Post>>(`${this.apiUrl}/post/update`, post);
   }
 }

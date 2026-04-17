@@ -1,1 +1,488 @@
-<p>dashboard works!</p>
+<div class="admin-dashboard">
+  <!-- Mobile top bar -->
+  <div class="mobile-topbar d-lg-none">
+    <button type="button" class="sidebar-toggle" (click)="toggleSidebar()">
+      <span class="toggle-icon"></span>
+      <span class="toggle-icon"></span>
+      <span class="toggle-icon"></span>
+    </button>
+    <span class="mobile-title fw-bold">Admin Dashboard</span>
+  </div>
+
+  <!-- Backdrop for mobile sidebar -->
+  @if (sidebarOpen()) {
+  <div class="sidebar-backdrop d-lg-none" (click)="toggleSidebar()"></div>
+  }
+
+  <div class="dashboard-layout">
+    <!-- ─── Sidebar ─── -->
+    <aside class="dashboard-sidebar" [class.open]="sidebarOpen()">
+      <div class="sidebar-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+        </div>
+        <div>
+          <div class="fw-bold">Admin Panel</div>
+          <small class="brand-sub">Moderation tools</small>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-group-label">Dashboard</div>
+
+        <button type="button" class="nav-item" [class.active]="activeSection() === 'overview'"
+          (click)="setActiveSection('overview')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+          </svg>
+          <span>Overview</span>
+        </button>
+
+        <div class="nav-group-label">Management</div>
+
+        <button type="button" class="nav-item" [class.active]="activeSection() === 'users'"
+          (click)="setActiveSection('users')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 00-3-3.87" />
+            <path d="M16 3.13a4 4 0 010 7.75" />
+          </svg>
+          <span>Users</span>
+          <span class="nav-badge">{{ users().length }}</span>
+        </button>
+
+        <button type="button" class="nav-item" [class.active]="activeSection() === 'posts'"
+          (click)="setActiveSection('posts')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+          </svg>
+          <span>Posts</span>
+          <span class="nav-badge">{{ posts().length }}</span>
+        </button>
+
+        <div class="nav-group-label">Reports</div>
+
+        <button type="button" class="nav-item" [class.active]="activeSection() === 'user-reports'"
+          (click)="setActiveSection('user-reports')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+            <circle cx="8.5" cy="7" r="4" />
+            <line x1="18" y1="8" x2="23" y2="13" />
+            <line x1="23" y1="8" x2="18" y2="13" />
+          </svg>
+          <span>User Reports</span>
+          @if (openUserReports() > 0) {
+          <span class="nav-badge danger">{{ openUserReports() }}</span>
+          }
+        </button>
+
+        <button type="button" class="nav-item" [class.active]="activeSection() === 'post-reports'"
+          (click)="setActiveSection('post-reports')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="9" y1="15" x2="15" y2="15" />
+            <circle cx="12" cy="15" r="4" />
+            <line x1="12" y1="13" x2="12" y2="15.5" />
+          </svg>
+          <span>Post Reports</span>
+          @if (openPostReports() > 0) {
+          <span class="nav-badge danger">{{ openPostReports() }}</span>
+          }
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a routerLink="/" class="nav-item">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+          <span>Back to Blog</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ─── Main Content ─── -->
+    <main class="dashboard-main">
+      @if (isLoading()) {
+      <div class="loading-state rounded-4 p-5 text-center">
+        <div class="spinner-border" role="status"></div>
+        <p class="mt-3 mb-0">Loading moderation data…</p>
+      </div>
+      } @else if (errorMessage()) {
+      <div class="error-state rounded-4 p-4" role="alert">
+        <strong>Error:</strong> {{ errorMessage() }}
+        <button type="button" class="btn btn-sm btn-light rounded-pill ms-3" (click)="loadDashboard()">Retry</button>
+      </div>
+      } @else {
+
+      <!-- ═══ Overview ═══ -->
+      @if (activeSection() === 'overview') {
+      <header class="section-header">
+        <h1 class="section-title">Overview</h1>
+        <p class="section-subtitle">A quick glance at your community health and moderation status.</p>
+      </header>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon users-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Users</span>
+            <strong class="stat-value">{{ users().length }}</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon success-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+              <polyline points="22 4 12 14.01 9 11.01" />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Active Users</span>
+            <strong class="stat-value">{{ enabledUsersCount() }}</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon danger-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07" />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Blocked</span>
+            <strong class="stat-value">{{ blockedUsersCount() }}</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon warning-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path
+                d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Open Reports</span>
+            <strong class="stat-value">{{ totalOpenReports() }}</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon posts-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Posts</span>
+            <strong class="stat-value">{{ posts().length }}</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon admin-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Admins</span>
+            <strong class="stat-value">{{ adminUsersCount() }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <h2 class="subsection-title">Quick Actions</h2>
+        <div class="action-cards">
+          <button type="button" class="action-card" (click)="setActiveSection('users')">
+            <span class="action-label">Manage Users</span>
+            <span class="action-desc">View, ban, or delete user accounts</span>
+          </button>
+          <button type="button" class="action-card" (click)="setActiveSection('posts')">
+            <span class="action-label">Manage Posts</span>
+            <span class="action-desc">Review and moderate published posts</span>
+          </button>
+          <button type="button" class="action-card" (click)="setActiveSection('user-reports')">
+            <span class="action-label">User Reports</span>
+            <span class="action-desc">{{ openUserReports() }} open reports to review</span>
+          </button>
+          <button type="button" class="action-card" (click)="setActiveSection('post-reports')">
+            <span class="action-label">Post Reports</span>
+            <span class="action-desc">{{ openPostReports() }} open reports to review</span>
+          </button>
+        </div>
+      </div>
+      }
+
+      <!-- ═══ Users ═══ -->
+      @if (activeSection() === 'users') {
+      <header class="section-header">
+        <div>
+          <h1 class="section-title">Users</h1>
+          <p class="section-subtitle">Search, inspect, ban, unban, or delete accounts.</p>
+        </div>
+        <div class="search-shell">
+          <input type="search" class="form-control rounded-pill px-4 py-2" [value]="searchTerm()"
+            (input)="updateSearch($event)" placeholder="Search users…">
+        </div>
+      </header>
+
+      <div class="row g-3">
+        @for (user of filteredUsers(); track user.id) {
+        <div class="col-12 col-md-6 col-xl-4">
+          <article class="user-card rounded-4 p-4 h-100">
+            <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+              <div class="d-flex align-items-center gap-3">
+                <img
+                  [src]="user.avatarUrl || 'https://ui-avatars.com/api/?name=' + user.username + '&background=random'"
+                  [alt]="user.username" class="rounded-circle object-fit-cover user-avatar" width="52" height="52">
+                <div>
+                  <a class="fw-bold text-decoration-none text-reset" [routerLink]="['/profile', user.id]">
+                    {{ user.fullName || user.username }}
+                  </a>
+                  <div class="text-muted small">&#64;{{ user.username }}</div>
+                </div>
+              </div>
+              <span class="status-badge" [ngClass]="user.access === 'BLOCKED' ? 'blocked' : 'enabled'">
+                {{ user.access }}
+              </span>
+            </div>
+
+            <div class="user-meta mb-3">
+              <div class="meta-pill"><span>Role</span> <strong>{{ user.role }}</strong></div>
+              <div class="meta-pill"><span>Followers</span> <strong>{{ user.followersCount || 0 }}</strong></div>
+              <div class="meta-pill"><span>Following</span> <strong>{{ user.followingCount || 0 }}</strong></div>
+            </div>
+
+            <div class="small text-muted mb-3">{{ user.email }}</div>
+
+            <div class="d-flex flex-wrap gap-2 mt-auto">
+              <a class="btn btn-sm btn-light rounded-pill px-3" [routerLink]="['/profile', user.id]">View profile</a>
+              @if (currentUserId() !== user.id && user.role !== 'ADMIN') {
+              <button type="button" class="btn btn-sm rounded-pill px-3"
+                [ngClass]="user.access === 'BLOCKED' ? 'btn-outline-success' : 'btn-outline-warning'"
+                [disabled]="processingUserId() === user.id" (click)="toggleUserAccess(user)">
+                {{ processingUserId() === user.id ? 'Saving…' : user.access === 'BLOCKED' ? 'Unban' : 'Ban' }}
+              </button>
+              <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                [disabled]="deletingUserId() === user.id" (click)="deleteUser(user)">
+                {{ deletingUserId() === user.id ? 'Deleting…' : 'Delete' }}
+              </button>
+              } @else {
+              <span class="protected-badge">Protected</span>
+              }
+            </div>
+          </article>
+        </div>
+        } @empty {
+        <div class="col-12">
+          <div class="empty-state rounded-4 p-5 text-center">No users match the current search.</div>
+        </div>
+        }
+      </div>
+      }
+
+      <!-- ═══ Posts ═══ -->
+      @if (activeSection() === 'posts') {
+      <header class="section-header">
+        <div>
+          <h1 class="section-title">Posts</h1>
+          <p class="section-subtitle">Review and moderate published content.</p>
+        </div>
+        <div class="search-shell">
+          <input type="search" class="form-control rounded-pill px-4 py-2" [value]="searchTerm()"
+            (input)="updateSearch($event)" placeholder="Search posts…">
+        </div>
+      </header>
+
+      <div class="table-wrapper rounded-4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Type</th>
+              <th>Engagement</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (post of filteredPosts(); track post.id) {
+            <tr>
+              <td>
+                <a class="fw-semibold text-decoration-none text-reset" [routerLink]="['/post', post.id]">
+                  {{ post.title }}
+                </a>
+              </td>
+              <td class="text-muted">{{ post.username || post.userId }}</td>
+              <td><span class="type-badge">{{ post.mediaType }}</span></td>
+              <td class="text-muted">
+                <span class="me-3">❤ {{ post.likesCount || 0 }}</span>
+                <span>💬 {{ post.commentsCount || 0 }}</span>
+              </td>
+              <td class="text-end">
+                <div class="d-flex gap-2 justify-content-end">
+                  <a class="btn btn-sm btn-light rounded-pill px-3" [routerLink]="['/post', post.id]">Open</a>
+                  <button type="button" class="btn btn-sm btn-outline-warning rounded-pill px-3"
+                    [disabled]="hidingPostId() === post.id" (click)="hidePost(post)">
+                    {{ hidingPostId() === post.id ? 'Hiding…' : post.isHidden ? 'Unhide' : 'Hide' }}
+                  </button>
+                  <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                    [disabled]="deletingPostId() === post.id" (click)="deletePost(post)">
+                    {{ deletingPostId() === post.id ? 'Removing…' : 'Remove' }}
+                  </button>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="5" class="text-center py-5 text-muted">No posts available.</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+
+      <!-- ═══ User Reports ═══ -->
+      @if (activeSection() === 'user-reports') {
+      <header class="section-header">
+        <div>
+          <h1 class="section-title">User Reports</h1>
+          <p class="section-subtitle">Reports filed against user accounts.</p>
+        </div>
+        <div class="search-shell">
+          <input type="search" class="form-control rounded-pill px-4 py-2" [value]="searchTerm()"
+            (input)="updateSearch($event)" placeholder="Search user reports…">
+        </div>
+      </header>
+
+      <div class="reports-grid">
+        @for (report of filteredUserReports(); track report.id) {
+        <article class="report-card rounded-4 p-4">
+          <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+            <span class="type-badge user-type">USER</span>
+            <span class="status-badge" [ngClass]="report.status === 'OPEN' ? 'open' : 'reviewed'">
+              {{ report.status }}
+            </span>
+          </div>
+          <h3 class="h6 fw-bold mb-2">{{ report.reason }}</h3>
+          <p class="text-muted small mb-3">
+            {{ report.details || 'No additional details were included with this report.' }}
+          </p>
+          <div class="report-meta mb-3">
+            <small class="text-muted">Target: 
+              <a [routerLink]="['/profile', report.targetId]" target="_blank" class="text-decoration-none fw-bold ms-1">
+                {{ report.targetId }}
+                <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+              </a>
+            </small>
+          </div>
+          @if (report.status === 'OPEN') {
+          <div class="d-flex gap-2 border-top pt-3">
+            <button class="btn btn-sm btn-outline-warning rounded-pill px-3" (click)="banUserFromReport(report)">
+              Ban User
+            </button>
+            <button class="btn btn-sm btn-light rounded-pill px-3 ms-auto" (click)="dismissReport(report)">
+              Ignore
+            </button>
+          </div>
+          }
+        </article>
+        } @empty {
+        <div class="empty-state rounded-4 p-5 text-center">No user reports available.</div>
+        }
+      </div>
+      }
+
+      <!-- ═══ Post Reports ═══ -->
+      @if (activeSection() === 'post-reports') {
+      <header class="section-header">
+        <div>
+          <h1 class="section-title">Post Reports</h1>
+          <p class="section-subtitle">Reports filed against published posts.</p>
+        </div>
+        <div class="search-shell">
+          <input type="search" class="form-control rounded-pill px-4 py-2" [value]="searchTerm()"
+            (input)="updateSearch($event)" placeholder="Search post reports…">
+        </div>
+      </header>
+
+      <div class="reports-grid">
+        @for (report of filteredPostReports(); track report.id) {
+        <article class="report-card rounded-4 p-4">
+          <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+            <span class="type-badge post-type">POST</span>
+            <span class="status-badge" [ngClass]="report.status === 'OPEN' ? 'open' : 'reviewed'">
+              {{ report.status }}
+            </span>
+          </div>
+          <h3 class="h6 fw-bold mb-2">{{ report.reason }}</h3>
+          <p class="text-muted small mb-3">
+            {{ report.details || 'No additional details were included with this report.' }}
+          </p>
+          <div class="report-meta mb-3">
+            <small class="text-muted">Target: 
+              <a [routerLink]="['/post', report.targetId]" target="_blank" class="text-decoration-none fw-bold ms-1">
+                {{ report.targetId }}
+                <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+              </a>
+            </small>
+          </div>
+          @if (report.status === 'OPEN') {
+          <div class="d-flex gap-2 border-top pt-3">
+            @if (getPost(report.targetId); as post) {
+              <button class="btn btn-sm btn-outline-warning rounded-pill px-3" (click)="hidePost(post)">
+                {{ post.isHidden ? 'Unhide Post' : 'Hide Post' }}
+              </button>
+            }
+            <button class="btn btn-sm btn-outline-danger rounded-pill px-3" (click)="deletePostFromReport(report)">
+              Delete
+            </button>
+            <button class="btn btn-sm btn-light rounded-pill px-3 ms-auto" (click)="dismissReport(report)">
+              Ignore
+            </button>
+          </div>
+          }
+        </article>
+        } @empty {
+        <div class="empty-state rounded-4 p-5 text-center">No post reports available.</div>
+        }
+      </div>
+      }
+
+      }
+    </main>
+  </div>
+</div>

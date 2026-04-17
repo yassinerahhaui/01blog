@@ -4,6 +4,8 @@ import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../../models/api-response';
 import { UserInfo } from '../../models/user-info';
+import { ReportRequest } from '../../models/report-request';
+import { ReportResponse } from '../../models/report-response';
 
 @Injectable({
   providedIn: 'root',
@@ -32,5 +34,9 @@ export class Profile {
   // Fetch the list of users that the specified user is following
   getFollowing(userId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile/${userId}/following`);
+  }
+
+  reportUser(targetUserId: string, payload: ReportRequest): Observable<ApiResponse<ReportResponse>> {
+    return this.http.post<ApiResponse<ReportResponse>>(`${this.apiUrl}/profile/${targetUserId}/report`, payload);
   }
 }

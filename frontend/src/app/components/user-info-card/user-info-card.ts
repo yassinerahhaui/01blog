@@ -5,6 +5,7 @@ import { UserInfo } from '../../core/models/user-info';
 import { ApiResponse } from '../../core/models/api-response';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { ReportResponse } from '../../core/models/report-response';
 
 @Component({
   selector: 'app-user-info-card',
@@ -17,7 +18,7 @@ export class UserInfoCard implements OnInit {
   private authService = inject(Auth);
   private profileService = inject(Profile);
 
-  currentUser = this.authService.currentUser()?.userId;
+  currentUser = signal(this.authService.currentUser());
   userId = input<string | undefined>();
 
   info = signal<UserInfo | null>(null);
@@ -29,11 +30,12 @@ export class UserInfoCard implements OnInit {
   usersList = signal<any[]>([]);
 
   followersCount = signal<number>(0);
+  followingCount = signal<number>(0);
   isFollowing = signal<boolean>(false);
-
-  // constructor() {
-  //   effect(() => {});
-  // }
+  reportReason = signal<string>('');
+  reportDetails = signal<string>('');
+  isSubmittingReport = signal<boolean>(false);
+  reportFeedback = signal<{ type: 'success' | 'danger'; message: string } | null>(null);
 
   ngOnInit(): void {
     this.loadInfo();
@@ -52,6 +54,13 @@ export class UserInfoCard implements OnInit {
     this.profileService.getUserInfo(targetId).subscribe({
       next: (res: ApiResponse<UserInfo>) => {
         this.info.set(res.data);
+
+        this.isFollowing.set(res.data.isFollowedByMe || false);
+        this.followersCount.set(res.data.followersCount || 0);
+        this.followingCount.set(res.data.followingCount || 0);
+        this.isFollowing.set(res.data.isFollowedByMe || false);
+        console.log(res.data.isFollowedByMe);
+
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -59,11 +68,6 @@ export class UserInfoCard implements OnInit {
         this.isLoading.set(false);
       },
     });
-    const profile = this.info();
-    if (profile) {
-      this.isFollowing.set(profile.isFollowedByMe);
-      this.followersCount.set(profile.followers);
-    }
   }
 
   openFollowList(type: 'followers' | 'following') {
@@ -110,5 +114,45 @@ export class UserInfoCard implements OnInit {
         this.followersCount.set(currentCount);
       },
     });
+  }
+
+  updateReportReason(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    this.reportReason.set(inputElement.value);
+  }
+
+  updateReportDetails(event: Event) {
+    const inputElement = event.target as HTMLTextAreaElement;
+    this.reportDetails.set(inputElement.value);
+  }
+
+  submitReport() {
+    const targetId = this.userId();
+    const reason = this.reportReason().trim();
+    const details = this.reportDetails().trim();
+
+    if (!targetId || !reason || this.isSubmittingReport()) return;
+
+    this.isSubmittingReport.set(true);
+    this.reportFeedback.set(null);
+
+    this.profileService
+      .reportUser(targetId, {
+        reason,
+        details: details || null,
+      })
+      .subscribe({
+        next: (res: ApiResponse<ReportResponse>) => {
+          this.reportFeedback.set({ type: 'success', message: 'User report submitted for review.' });
+          this.reportReason.set('');
+          this.reportDetails.set('');
+          this.isSubmittingReport.set(false);
+        },
+        error: (err) => {
+          const message = err?.error?.errors?.[0]?.message || 'Failed to submit this report.';
+          this.reportFeedback.set({ type: 'danger', message });
+          this.isSubmittingReport.set(false);
+        },
+      });
   }
 }

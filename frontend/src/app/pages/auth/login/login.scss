@@ -1,0 +1,129 @@
+.login-wrapper {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: var(--app-bg);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 900px;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 25px 60px var(--shadow-color);
+}
+
+/* ─── Left Hero Panel ─── */
+.login-hero {
+  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #6366f1 100%);
+  color: #fff;
+  padding: 3rem 2rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 80%, rgba(255,255,255,0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+}
+
+.hero-icon {
+  font-size: 3rem;
+  width: 80px;
+  height: 80px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(10px);
+}
+
+/* ─── Right Form Panel ─── */
+.login-form-panel {
+  padding: 2.5rem 2rem;
+  background: var(--surface-strong);
+  color: var(--text-primary);
+
+  @media (min-width: 768px) {
+    padding: 3rem 2.5rem;
+  }
+}
+
+.login-title {
+  color: var(--accent);
+}
+
+.login-subtitle {
+  color: var(--text-secondary);
+  margin-bottom: 0;
+}
+
+/* ─── Inputs ─── */
+.login-input {
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  border-radius: 0.65rem !important;
+  background-color: var(--surface-muted) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+  &::placeholder {
+    color: var(--text-secondary) !important;
+    opacity: 0.7;
+  }
+
+  &:focus {
+    background-color: var(--surface-strong) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 15%, transparent) !important;
+  }
+}
+
+.form-label {
+  color: var(--text-primary);
+}
+
+.form-check-label {
+  color: var(--text-secondary);
+}
+
+/* ─── Button ─── */
+.login-btn {
+  background: linear-gradient(135deg, #2563eb 0%, #6366f1 100%) !important;
+  border: none !important;
+  letter-spacing: 0.02em;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px color-mix(in srgb, var(--accent) 35%, transparent) !important;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
+/* ─── Link ─── */
+.login-link {
+  color: var(--accent);
+  transition: opacity 0.15s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}

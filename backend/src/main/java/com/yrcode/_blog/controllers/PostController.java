@@ -21,11 +21,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.yrcode._blog.abstracts.CommentService;
 import com.yrcode._blog.abstracts.PostService;
 import com.yrcode._blog.abstracts.ReactionService;
+import com.yrcode._blog.abstracts.ReportService;
 import com.yrcode._blog.dtos.comment.CommentDTO;
 import com.yrcode._blog.dtos.comment.CommentRequestDTO;
 import com.yrcode._blog.dtos.post.PostCreateDTO;
 import com.yrcode._blog.dtos.post.PostDetailsDTO;
 import com.yrcode._blog.dtos.post.PostUpdateDTO;
+import com.yrcode._blog.dtos.report.ReportRequestDTO;
+import com.yrcode._blog.dtos.report.ReportResponseDTO;
+import com.yrcode._blog.enums.ReportTargetType;
 import com.yrcode._blog.shared.GlobalResponse;
 
 import jakarta.validation.Valid;
@@ -40,6 +44,7 @@ public class PostController {
     @Autowired
     private CommentService commentService;
     @Autowired ReactionService reactionService;
+    @Autowired ReportService reportService;
 
     @GetMapping("/all")
     public ResponseEntity<GlobalResponse<List<PostDetailsDTO>>> findAll() {
@@ -96,5 +101,13 @@ public class PostController {
             result = true;
         }
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(result));
+    }
+
+    @PostMapping("/{postId}/report")
+    public ResponseEntity<GlobalResponse<ReportResponseDTO>> reportPost(
+            @PathVariable UUID postId,
+            @Valid @RequestBody ReportRequestDTO request) {
+        ReportResponseDTO report = reportService.createReport(postId, ReportTargetType.POST, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(report));
     }
 }

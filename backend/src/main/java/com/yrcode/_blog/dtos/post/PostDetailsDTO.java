@@ -16,8 +16,10 @@ public record PostDetailsDTO(
     String mediaUrl,
     MediaType mediaType,
     UUID userId,
+    String username,
     Integer commentsCount,
     Integer likesCount,
     boolean isLikedByMe,
+    boolean isHidden,
     LocalDateTime createdAt
 ) {}

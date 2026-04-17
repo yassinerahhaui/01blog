@@ -1,8 +1,8 @@
 <div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
+  <div class="row g-4 align-items-start justify-content-center">
+    <div class="col-12 col-xl-6">
 
-      <div class="card shadow-sm border-0 rounded-4">
+      <div class="card shadow-sm border-0 rounded-4 create-post-card">
         <div class="card-body p-4 p-md-5">
           <h2 class="fw-bold mb-4 text-dark">Create New Post ✍️</h2>
 
@@ -12,7 +12,7 @@
               <label class="form-label fw-bold text-secondary">
                 Post Title <span class="text-danger">*</span>
               </label>
-              <input type="text" class="form-control form-control-lg bg-light border-0"
+              <input type="text" class="form-control form-control-lg border-0 create-post-input"
                      name="title" [ngModel]="title()" (ngModelChange)="title.set($event)"
                      placeholder="Enter an engaging title..." required>
             </div>
@@ -21,9 +21,12 @@
               <label class="form-label fw-bold text-secondary">
                 Content <span class="text-danger">*</span>
               </label>
-              <textarea class="form-control bg-light border-0" rows="10"
+              <textarea class="form-control border-0 create-post-input create-post-textarea" rows="16"
                         name="content" [ngModel]="content()" (ngModelChange)="content.set($event)"
                         placeholder="Write your amazing content here (Markdown supported)..." required></textarea>
+              <small class="text-muted d-block mt-2">
+                Supports headings, lists, links, blockquotes, bold, italic, and code.
+              </small>
             </div>
 
             <hr class="my-4 text-muted opacity-25">
@@ -32,11 +35,11 @@
               Attach Media <span class="text-muted fs-6 fw-normal">(Optional) 📸</span>
             </h5>
 
-            <div class="row bg-light p-3 rounded-3 border-0 mb-4 align-items-center">
+            <div class="row p-3 rounded-3 border-0 mb-4 align-items-center upload-panel">
 
-              <div class="mb-3 mb-md-0" [class.border-end]="true">
+              <div class="mb-3 mb-md-0">
                 <label class="form-label fw-bold text-dark">Upload File (MinIO)</label>
-                <input type="file" class="form-control border-0 shadow-sm"
+                <input type="file" class="form-control border-0 shadow-sm create-post-file-input"
                        (change)="onFileSelected($event)"
                        accept="image/*,video/*">
                 <small class="text-muted d-block mt-2">Select an image or video from your device.</small>
@@ -63,6 +66,32 @@
         </div>
       </div>
 
+    </div>
+
+    <div class="col-12 col-xl-6">
+      <div class="card shadow-sm border-0 rounded-4 preview-card sticky-xl-top">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+            <div>
+              <p class="text-uppercase small fw-bold text-primary mb-1">Live Preview</p>
+              <h3 class="h4 fw-bold text-dark mb-0">
+                {{ title().trim() || 'Untitled post' }}
+              </h3>
+            </div>
+          </div>
+
+          <div class="preview-surface rounded-4 p-4">
+            @if (content().trim()) {
+              <div class="markdown-preview" [innerHTML]="renderedPreview()"></div>
+            } @else {
+              <div class="preview-empty text-center text-muted py-5">
+                <i class="fa-regular fa-pen-to-square fs-2 mb-3 d-block"></i>
+                Start writing on the left to see the Markdown preview here.
+              </div>
+            }
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -1,23 +1,217 @@
+.app-navbar {
+  background: var(--surface-elevated);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(18px);
+  position: sticky;
+  top: 0;
+  z-index: 1040;
+}
 
+.navbar-brand,
+.nav-link {
+  color: var(--text-primary);
+}
 
-// /* Logo / brand */
-// .navbar-brand {
-//   gap: 10px;
-// }
+.nav-link:hover,
+.navbar-brand:hover {
+  color: var(--accent);
+}
 
-// .navbar-brand .logo-img {
-//   width: 40px;
-//   height: 40px;
-//   display: inline-block;
-// }
+.brand-text {
+  color: var(--text-primary);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
 
-// .navbar-brand .brand-text {
-//   color: #fff;
-//   font-weight: 700;
-//   font-size: 1.05rem;
-//   letter-spacing: 0.4px;
-// }
+.brand-accent {
+  color: var(--accent);
+}
 
-// .navbar-brand:hover .brand-text {
-//   color: #e2e8f0;
-// }
+.theme-toggle {
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.theme-toggle:hover {
+  background: var(--surface-elevated);
+  color: var(--accent);
+}
+
+/* ── Notification bell ─────────────────────────────────── */
+
+.notif-wrapper {
+  position: relative;
+  z-index: 1050;
+}
+
+.notif-bell {
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  &:hover {
+    background: var(--surface-elevated);
+    color: var(--accent);
+  }
+}
+
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 99px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  padding: 0 4px;
+  border: 2px solid var(--surface-elevated);
+}
+
+/* ── Dropdown ──────────────────────────────────────────── */
+
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  max-height: 420px;
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 16px 48px var(--shadow-color);
+  z-index: 1070;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: notif-slide 0.2s ease;
+}
+
+@keyframes notif-slide {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.9rem;
+}
+
+.notif-list {
+  overflow-y: auto;
+  flex: 1;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--surface-muted);
+  }
+
+  &.unread {
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+  }
+}
+
+.notif-icon-wrap {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--accent);
+  flex-shrink: 0;
+  font-size: 0.85rem;
+}
+
+.notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-message {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.notif-time {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.notif-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.notif-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+
+  i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    opacity: 0.5;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+/* Invisible backdrop to close dropdown on outside click */
+.notif-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+}
+
+@media (max-width: 575.98px) {
+  .notif-dropdown {
+    width: calc(100vw - 2rem);
+    right: -1rem;
+  }
+}

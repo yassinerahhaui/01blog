@@ -14,35 +14,55 @@
 
     <div class="dropdown position-absolute top-0 end-0 m-3">
       <button
-        class="btn btn-light btn-sm rounded-circle shadow border-0 d-flex justify-content-center align-items-center"
+        class="btn btn-sm rounded-circle shadow border-0 d-flex justify-content-center align-items-center post-menu-trigger"
         type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 35px; height: 35px;">
-        <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
+        <i class="fa-solid fa-ellipsis-vertical post-menu-icon"></i>
       </button>
 
-      <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3">
+      <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 post-menu">
         @if (post().userId === currentUser()?.userId) {
         <li>
-          <a class="dropdown-item fw-semibold text-primary" href="#">
+          <button type="button" class="dropdown-item fw-semibold post-menu-item post-menu-item-primary" (click)="startEdit()">
             <i class="fa-solid fa-pen-to-square me-2"></i> Edit
-          </a>
+          </button>
         </li>
         <li>
-          <a class="dropdown-item fw-semibold text-danger" href="#">
+          <a class="dropdown-item fw-semibold post-menu-item post-menu-item-danger" href="#">
             <i class="fa-solid fa-trash me-2"></i> Delete
           </a>
         </li>
         }
         @else {
         <li>
-          <a class="dropdown-item fw-semibold text-danger" href="#">
+          <button
+            type="button"
+            class="dropdown-item fw-semibold post-menu-item post-menu-item-danger"
+            data-bs-toggle="modal"
+            [attr.data-bs-target]="'#reportPostModal-' + post().id">
             <i class="fa-solid fa-flag me-2"></i> Report
-          </a>
+          </button>
         </li>
         }
       </ul>
     </div>
   </div>
 
+  @if (isEditing()) {
+  <div class="card-body px-4 pt-4 pb-2 d-flex flex-column">
+    <div class="mb-3">
+      <input type="text" class="form-control rounded-3 fw-bold" [value]="editTitle()" (input)="updateEditTitle($event)" placeholder="Post title">
+    </div>
+    <div class="mb-3">
+      <textarea class="form-control rounded-3" rows="4" [value]="editContent()" (input)="updateEditContent($event)" placeholder="Post content"></textarea>
+    </div>
+    <div class="d-flex gap-2">
+      <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" [disabled]="isSaving()" (click)="saveEdit()">
+        {{ isSaving() ? 'Saving...' : 'Save' }}
+      </button>
+      <button type="button" class="btn btn-sm btn-light rounded-pill px-3" [disabled]="isSaving()" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+  } @else {
   <div class="card-body px-4 pt-4 pb-2 d-flex flex-column pointer" [routerLink]="['/post', post().id]">
     <h5 class="card-title fw-bold text-dark mb-2 text-truncate" [title]="post().title">
       {{ post().title }}
@@ -55,6 +75,7 @@
       }}
     </p>
   </div>
+  }
 
   <div class="card-footer bg-transparent border-top-0 px-4 pb-4 pt-2 mt-auto">
     <div class="d-flex justify-content-between align-items-center">
@@ -73,6 +94,62 @@
         <i class="fa-regular fa-comment text-primary me-1 fs-5 align-middle"></i> {{ post().commentsCount }}
       </button>
 
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" [id]="'reportPostModal-' + post().id" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+      <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
+        <h5 class="modal-title fw-bold">Report Post</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body px-4 pb-4">
+        <p class="text-secondary small mb-3">
+          Tell the moderation team why this post should be reviewed.
+        </p>
+
+        @if (reportFeedback(); as feedback) {
+        <div class="alert rounded-4 py-2 border-0" [ngClass]="'alert-' + feedback.type">
+          {{ feedback.message }}
+        </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Reason</label>
+          <input
+            type="text"
+            class="form-control rounded-4"
+            placeholder="Spam, abuse, plagiarism..."
+            [value]="reportReason()"
+            (input)="updateReportReason($event)"
+            [disabled]="isSubmittingReport()">
+        </div>
+
+        <div>
+          <label class="form-label fw-semibold">Details</label>
+          <textarea
+            class="form-control rounded-4"
+            rows="4"
+            placeholder="Add context for the moderation team"
+            [value]="reportDetails()"
+            (input)="updateReportDetails($event)"
+            [disabled]="isSubmittingReport()"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        <button
+          type="button"
+          class="btn btn-danger rounded-pill px-4"
+          [disabled]="!reportReason().trim() || isSubmittingReport()"
+          (click)="submitReport()">
+          {{ isSubmittingReport() ? 'Submitting...' : 'Submit Report' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -101,8 +178,8 @@
           <img [src]="'https://ui-avatars.com/api/?name=' + comment.username + '&background=random'"
             class="rounded-circle me-3 border shadow-sm object-fit-cover" width="45" height="45" alt="Avatar">
 
-          <div class="bg-light rounded-4 p-3 flex-grow-1">
-            <h6 class="fw-bold mb-1 small text-dark">{{ comment.username }}</h6>
+          <div class="comment-bubble rounded-4 p-3 flex-grow-1">
+            <h6 class="fw-bold mb-1 small">{{ comment.username }}</h6>
             <p class="mb-0 small text-muted">{{ comment.content }}</p>
           </div>
         </div>
@@ -117,10 +194,10 @@
         }
       </div>
 
-      <div class="modal-footer border-top-0 pt-2 pb-4 px-4 bg-white rounded-bottom-4">
+      <div class="modal-footer border-top-0 pt-2 pb-4 px-4 comment-footer rounded-bottom-4">
         <div class="input-group">
 
-          <input type="text" class="form-control rounded-pill bg-light border-0 shadow-none ps-4 py-2"
+          <input type="text" class="form-control rounded-pill comment-input border-0 shadow-none ps-4 py-2"
             placeholder="Write a comment..." [value]="newCommentText()" (input)="updateCommentText($event)"
             (keyup.enter)="submitComment()" [disabled]="isSendingComment()">
 

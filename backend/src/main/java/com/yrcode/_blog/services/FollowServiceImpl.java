@@ -20,6 +20,7 @@ public class FollowServiceImpl implements FollowService {
     private final UserRepo userRepo;
     private final SecurityUtils securityUtils;
 
+    @Override
     @Transactional
     public Boolean toggleFollow(UUID targetUserId) {
         UUID currentUserId = securityUtils.getCurrentUserId();

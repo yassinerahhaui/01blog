@@ -44,6 +44,10 @@ public class PostEntity extends AbstractEntity {
     @lombok.Builder.Default
     private MediaType mediaType = MediaType.EMPTY;
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    @lombok.Builder.Default
+    private Boolean isHidden = false;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

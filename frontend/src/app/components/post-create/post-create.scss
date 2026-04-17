@@ -1,0 +1,120 @@
+.create-post-card,
+.preview-card {
+  background: var(--surface-elevated, #fff);
+}
+
+.create-post-input,
+.create-post-file-input {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.create-post-textarea {
+  min-height: 24rem;
+  resize: vertical;
+}
+
+.create-post-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.upload-panel {
+  background: var(--surface-muted);
+  border: 1px solid var(--border-color);
+}
+
+.preview-surface {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top right, rgba(13, 110, 253, 0.08), transparent 30%),
+    var(--surface-muted);
+  border: 1px solid var(--border-color);
+}
+
+.preview-empty {
+  min-height: 24rem;
+  display: grid;
+  place-items: center;
+}
+
+.markdown-preview {
+  color: var(--text-primary);
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.markdown-preview :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+}
+
+.markdown-preview h1 {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+}
+
+.markdown-preview h2 {
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+}
+
+.markdown-preview h3 {
+  font-size: 1.4rem;
+}
+
+.markdown-preview p,
+.markdown-preview ul,
+.markdown-preview ol,
+.markdown-preview blockquote,
+.markdown-preview pre {
+  margin: 0 0 1rem;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+  padding-left: 1.5rem;
+}
+
+.markdown-preview blockquote {
+  border-left: 4px solid var(--bs-primary);
+  padding: 0.75rem 1rem;
+  background: rgba(13, 110, 253, 0.06);
+  border-radius: 1rem;
+}
+
+.markdown-preview blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-preview code {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.95em;
+}
+
+.markdown-preview pre {
+  background: #101828;
+  color: #f8fafc;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+
+.markdown-preview pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.markdown-preview a {
+  color: var(--bs-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+@media (min-width: 1200px) {
+  .sticky-xl-top {
+    top: 1.5rem;
+  }
+}

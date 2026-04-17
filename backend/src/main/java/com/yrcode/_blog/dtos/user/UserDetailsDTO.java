@@ -17,7 +17,7 @@ public record UserDetailsDTO(
     String avatarUrl,
     Role role,
     Access access,
-    Integer followers,
-    Integer following,
+    Integer followersCount,
+    Integer followingCount,
     Boolean isFollowedByMe
 ) {}

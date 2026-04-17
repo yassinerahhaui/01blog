@@ -15,4 +15,5 @@ public interface PostService {
     PostDetailsDTO createOne(PostCreateDTO data, MultipartFile file);
     void deleteOne(UUID id);
     PostDetailsDTO updateOne(PostUpdateDTO data);
+    PostDetailsDTO toggleHidePost(UUID id);
 }

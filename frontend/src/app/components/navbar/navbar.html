@@ -1,8 +1,7 @@
-<nav class="navbar navbar-expand-lg fw-bold bg-primary-subtle" data-bs-theme="dark">
+<nav class="navbar navbar-expand-lg fw-bold app-navbar">
   <div class="container">
-    <a class="navbar-brand d-flex fs-3 align-items-center text-light" routerLink="/">
-      <!-- <img src="assets/logo-01blog.svg" alt="01Blog" class="logo-img"/> -->
-      <span class="brand-text">01<span class="text-primary text-bold">Blog</span> </span>
+    <a class="navbar-brand d-flex fs-3 align-items-center" routerLink="/">
+      <span class="brand-text">01<span class="brand-accent">Blog</span> </span>
     </a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -15,12 +14,83 @@
         <li class="nav-item">
           <a class="nav-link" aria-current="page" routerLink="/profile">Profile</a>
         </li>
-      </ul>
-      <ul class="navbar-nav mb-2 mb-lg-0">
+        @if (authService.currentUser()?.role === 'ADMIN') {
         <li class="nav-item">
+          <a class="nav-link" aria-current="page" routerLink="/dashboard">Dashboard</a>
+        </li>
+        }
+      </ul>
+      <ul class="navbar-nav mb-2 mb-lg-0 align-items-center">
+        <!-- Notifications bell -->
+        <li class="nav-item notif-wrapper me-2">
+          <button type="button" class="btn btn-sm notif-bell position-relative" (click)="toggleNotifications()">
+            <i class="fa-regular fa-bell"></i>
+            @if (notifService.unreadCount() > 0) {
+            <span class="notif-badge">{{ notifService.unreadCount() }}</span>
+            }
+          </button>
+
+          @if (notifOpen) {
+          <div class="notif-dropdown">
+            <div class="notif-header">
+              <span class="fw-bold">Notifications</span>
+              @if (notifService.unreadCount() > 0) {
+              <button type="button" class="btn btn-sm btn-link text-decoration-none p-0" (click)="markAllAsRead()">
+                Mark all read
+              </button>
+              }
+            </div>
+
+            <div class="notif-list">
+              @for (notif of notifService.items(); track notif.id) {
+              <button type="button" class="notif-item" [class.unread]="!notif.isRead"
+                (click)="markAsRead(notif.id); navigateToPost(notif)">
+                <div class="notif-icon-wrap">
+                  <i class="fa-solid fa-file-pen"></i>
+                </div>
+                <div class="notif-content">
+                  <p class="notif-message mb-0">{{ notif.message }}</p>
+                  <small class="notif-time">{{ notif.createdAt | date:'short' }}</small>
+                </div>
+                @if (!notif.isRead) {
+                <span class="notif-dot"></span>
+                } @else {
+                <button type="button" class="btn btn-sm text-danger p-0 ms-2" (click)="deleteNotification($event, notif.id)" title="Remove notification">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+                }
+              </button>
+              } @empty {
+              <div class="notif-empty">
+                <i class="fa-regular fa-bell-slash"></i>
+                <p>No notifications yet</p>
+              </div>
+              }
+            </div>
+          </div>
+          }
+        </li>
+
+        <li class="nav-item d-flex align-items-center me-2">
+          <button class="btn btn-sm theme-toggle fw-bold" type="button" (click)="onToggleTheme()">
+            @if (themeService.mode() === 'dark') {
+              <i class="fa-regular fa-sun me-2"></i>
+              Light
+            } @else {
+              <i class="fa-regular fa-moon me-2"></i>
+              Dark
+            }
+          </button>
+        </li>
+        <li class="nav-item d-flex align-items-center">
           <button class="btn btn-sm btn-outline-danger fw-bold" aria-current="button" (click)="onLogout()">logout</button>
         </li>
       </ul>
     </div>
   </div>
 </nav>
+
+<!-- Backdrop to close notif panel on outside click -->
+@if (notifOpen) {
+<div class="notif-backdrop" (click)="closeNotifications()"></div>
+}

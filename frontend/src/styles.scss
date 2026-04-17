@@ -2,12 +2,126 @@
 
 /* Importing Bootstrap SCSS file. */
 // @import 'bootstrap/scss/bootstrap';
+
+:root {
+  --app-bg: linear-gradient(120deg, #f8fafc 0%, #eef2ff 100%);
+  --surface-base: #f8fafc;
+  --surface-elevated: rgba(255, 255, 255, 0.82);
+  --surface-muted: #eef2ff;
+  --surface-strong: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: rgba(15, 23, 42, 0.1);
+  --accent: #2563eb;
+  --shadow-color: rgba(15, 23, 42, 0.08);
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --app-bg: radial-gradient(circle at top, #1e293b 0%, #0f172a 55%, #020617 100%);
+  --surface-base: #0f172a;
+  --surface-elevated: rgba(15, 23, 42, 0.82);
+  --surface-muted: #1e293b;
+  --surface-strong: #111827;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(148, 163, 184, 0.2);
+  --accent: #60a5fa;
+  --shadow-color: rgba(2, 6, 23, 0.45);
+  color-scheme: dark;
+}
+
+html,
 body {
   width: 100%;
-  height: 100vh;
-  background-color: #82B1FF;
+  min-height: 100vh;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--text-primary);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
 }
 
 .pointer {
   cursor: pointer !important;
+}
+
+main {
+  color: inherit;
+}
+
+.bg-white,
+.card,
+.modal-content,
+.dropdown-menu,
+.list-group-item,
+.form-control,
+.form-select,
+.input-group-text,
+.alert,
+.table,
+.accordion-item {
+  background-color: var(--surface-strong) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.text-dark,
+.card-title,
+.modal-title,
+.dropdown-item,
+.navbar-toggler,
+.btn-close {
+  color: var(--text-primary) !important;
+}
+
+.text-muted,
+.text-secondary,
+.card-text,
+.form-control::placeholder,
+.nav-link {
+  color: var(--text-secondary) !important;
+}
+
+.shadow-sm,
+.shadow,
+.shadow-lg {
+  box-shadow: 0 20px 40px var(--shadow-color) !important;
+}
+
+.btn-light {
+  background: var(--surface-muted) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-outline-primary,
+.btn-outline-danger {
+  border-width: 1px;
+}
+
+.form-control,
+.form-select {
+  box-shadow: none !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent) !important;
+  box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent) 18%, transparent) !important;
+}
+
+.navbar-toggler {
+  border-color: var(--border-color) !important;
+}
+
+.navbar-toggler-icon {
+  filter: var(--navbar-toggle-filter, none);
+}
+
+[data-theme='dark'] .navbar-toggler-icon {
+  --navbar-toggle-filter: invert(1);
 }

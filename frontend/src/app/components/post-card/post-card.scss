@@ -1,5 +1,57 @@
-.dropdown-style {
-  position: absolute;
-  top: 10px;
-  left: 10px;
+.post-menu-trigger {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.post-menu-trigger:hover,
+.post-menu-trigger:focus,
+.post-menu-trigger:active {
+  background: var(--surface-strong);
+  color: var(--accent);
+}
+
+.post-menu-icon {
+  color: var(--text-secondary);
+}
+
+.post-menu {
+  background: var(--surface-strong);
+  border: 1px solid var(--border-color);
+}
+
+.post-menu-item {
+  color: var(--text-primary);
+}
+
+.post-menu-item:hover,
+.post-menu-item:focus {
+  background: var(--surface-muted);
+}
+
+.post-menu-item-primary {
+  color: var(--accent);
+}
+
+.post-menu-item-danger {
+  color: #dc3545;
+}
+
+/* ── Comment modal — dark mode aware ─────────────────── */
+
+.comment-bubble {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.comment-footer {
+  background: var(--surface-strong);
+}
+
+.comment-input {
+  background: var(--surface-muted) !important;
+  color: var(--text-primary) !important;
+
+  &::placeholder {
+    color: var(--text-secondary) !important;
+  }
 }

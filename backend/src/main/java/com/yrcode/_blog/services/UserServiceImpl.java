@@ -8,10 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yrcode._blog.abstracts.UserService;
+import com.yrcode._blog.dtos.admin.UserAccessUpdateDTO;
 import com.yrcode._blog.dtos.user.UserDetailsDTO;
 import com.yrcode._blog.dtos.user.UserUpdateDTO;
 import com.yrcode._blog.entities.UserEntity;
-import com.yrcode._blog.repositories.FollowRepo;
+import com.yrcode._blog.enums.Role;
 import com.yrcode._blog.repositories.UserRepo;
 import com.yrcode._blog.security.SecurityUtils;
 import com.yrcode._blog.shared.CustomResponseException;
@@ -20,8 +21,6 @@ import com.yrcode._blog.shared.CustomResponseException;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepo userRepo;
-    @Autowired
-    private FollowRepo followRepo;
     @Autowired
     private SecurityUtils securityUtils;
 
@@ -32,8 +31,10 @@ public class UserServiceImpl implements UserService {
 
         UUID currentUserId = securityUtils.getCurrentUserId();
 
-        boolean isFollowedByMe = followRepo.existsByFollowerIdAndFollowingId(currentUserId, userId);
+        boolean isFollowedByMe = userRepo.isFollowedByMe(currentUserId, user.getId());
 
+        // System.err.println("followers" + user.getFollowersCount() + "following: " + user.getFollowingCount());
+        
         return UserDetailsDTO.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
@@ -42,8 +43,8 @@ public class UserServiceImpl implements UserService {
                 .avatarUrl(user.getAvatarUrl())
                 .role(user.getRole())
                 .access(user.getAccess())
-                .followers(user.getFollowersCount() != null ? user.getFollowersCount() : 0)
-                .following(user.getFollowingCount() != null ? user.getFollowingCount() : 0)
+                .followersCount(user.getFollowersCount())
+                .followingCount(user.getFollowingCount())
                 .isFollowedByMe(isFollowedByMe)
                 .build();
     }
@@ -51,8 +52,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDetailsDTO> findAll() {
         List<UserEntity> users = userRepo.findAll();
+        UUID currentUserId = securityUtils.getCurrentUserId();
         return users.stream()
-                .map(user -> UserDetailsDTO.builder()
+                .map(user -> {
+                    boolean isFollowedByMe = userRepo.isFollowedByMe(currentUserId, user.getId());
+                    return UserDetailsDTO.builder()
                         .id(user.getId())
                         .fullName(user.getFullName())
                         .username(user.getUsername())
@@ -60,7 +64,11 @@ public class UserServiceImpl implements UserService {
                         .avatarUrl(user.getAvatarUrl())
                         .role(user.getRole())
                         .access(user.getAccess())
-                        .build())
+                        .followersCount(user.getFollowersCount())
+                        .followingCount(user.getFollowingCount())
+                        .isFollowedByMe(isFollowedByMe)
+                        .build();
+                })
                 .collect(toList());
     }
 
@@ -105,4 +113,33 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+    @Override
+    public UserDetailsDTO updateAccess(UUID userId, UserAccessUpdateDTO userAccessUpdate) {
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> CustomResponseException.BadRequest("Invalid user id!"));
+
+        UUID currentUserId = securityUtils.getCurrentUserId();
+        if (user.getId().equals(currentUserId) && userAccessUpdate.access() != user.getAccess()) {
+            throw CustomResponseException.BadRequest("You cannot change your own access.");
+        }
+
+        if (user.getRole() == Role.ADMIN && userAccessUpdate.access() != user.getAccess()) {
+            throw CustomResponseException.BadRequest("Admin users cannot be blocked.");
+        }
+
+        user.setAccess(userAccessUpdate.access());
+        UserEntity savedUser = userRepo.save(user);
+
+        return UserDetailsDTO.builder()
+                .id(savedUser.getId())
+                .fullName(savedUser.getFullName())
+                .username(savedUser.getUsername())
+                .email(savedUser.getEmail())
+                .avatarUrl(savedUser.getAvatarUrl())
+                .role(savedUser.getRole())
+                .access(savedUser.getAccess())
+                .followersCount(savedUser.getFollowersCount())
+                .followingCount(savedUser.getFollowingCount())
+                .build();
+    }
 }

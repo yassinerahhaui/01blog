@@ -96,7 +96,7 @@ public class AuthService implements UserDetailsService {
         return User.builder()
                 .username(account.getUsername())
                 .password(account.getPassword())
-                .roles(account.getRole().toString())
+                .authorities(account.getRole().toString())
                 .build();
     }
 

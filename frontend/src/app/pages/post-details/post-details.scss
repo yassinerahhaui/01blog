@@ -1,0 +1,128 @@
+.post-shell {
+  border: 1px solid var(--border-color);
+}
+
+.post-media {
+  max-height: 540px;
+  object-fit: cover;
+}
+
+.post-title {
+  line-height: 1.1;
+}
+
+.post-content {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  word-break: break-word;
+}
+
+.post-content :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--text-primary);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 1.5rem 0 1rem;
+}
+
+.post-content :is(h1, h2, h3, h4, h5, h6):first-child {
+  margin-top: 0;
+}
+
+.post-content :is(p, ul, ol, blockquote, pre) {
+  margin: 0 0 1rem;
+}
+
+.post-content :is(ul, ol) {
+  padding-left: 1.5rem;
+}
+
+.post-content blockquote {
+  border-left: 4px solid var(--bs-primary);
+  padding: 0.85rem 1rem;
+  background: rgba(13, 110, 253, 0.06);
+  border-radius: 1rem;
+}
+
+.post-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.post-content code {
+  background: rgba(15, 23, 42, 0.08);
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.95em;
+}
+
+.post-content pre {
+  background: #101828;
+  color: #f8fafc;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+}
+
+.post-content pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+.post-content a {
+  color: var(--bs-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+.action-pill {
+  cursor: default;
+}
+
+.comment-composer {
+  align-items: center;
+}
+
+.comment-input {
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.comment-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.composer-btn {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+}
+
+.comment-row {
+  align-items: flex-start;
+}
+
+.comment-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #0d6efd, #6ea8fe);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 10px 30px rgba(13, 110, 253, 0.18);
+}
+
+.comment-bubble,
+.empty-comments {
+  background: var(--surface-muted);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  padding: 1rem 1.1rem;
+}
+
+@media (max-width: 991.98px) {
+  .post-media {
+    max-height: 360px;
+  }
+}

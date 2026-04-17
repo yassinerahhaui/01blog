@@ -5,7 +5,10 @@ export interface Post {
   mediaUrl: string;
   mediaType: string;
   userId: string;
+  username?: string;
   commentsCount: number;
   likesCount: number;
   isLikedByMe: boolean;
+  isHidden: boolean;
+  createdAt: string;
 }

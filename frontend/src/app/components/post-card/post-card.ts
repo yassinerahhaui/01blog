@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, OnInit, signal } from '@angular/core'; // 👈 ضروري تزيد effect
+import { Component, effect, inject, input, OnInit, signal } from '@angular/core';
 import { Post } from '../../core/models/post';
 import { Comment } from '../../core/models/comment';
 import { CommonModule } from '@angular/common';
@@ -6,6 +6,7 @@ import { Auth } from '../../core/services/auth/auth';
 import { Posts } from '../../core/services/posts/posts';
 import { ApiResponse } from '../../core/models/api-response';
 import { RouterLink } from "@angular/router";
+import { ReportResponse } from '../../core/models/report-response';
 
 @Component({
   selector: 'app-post-card',
@@ -32,6 +33,16 @@ export class PostCard implements OnInit {
   isLoadingComments = signal<boolean>(false);
   isSendingComment = signal<boolean>(false);
   newCommentText = signal<string>('');
+  reportReason = signal<string>('');
+  reportDetails = signal<string>('');
+  isSubmittingReport = signal<boolean>(false);
+  reportFeedback = signal<{ type: 'success' | 'danger'; message: string } | null>(null);
+
+  // Edit state
+  isEditing = signal<boolean>(false);
+  editTitle = signal<string>('');
+  editContent = signal<string>('');
+  isSaving = signal<boolean>(false);
 
   constructor() {
     effect(() => {
@@ -103,5 +114,82 @@ export class PostCard implements OnInit {
   updateCommentText(event: Event) {
     const inputElement = event.target as HTMLInputElement;
     this.newCommentText.set(inputElement.value);
+  }
+
+  updateReportReason(event: Event) {
+    const inputElement = event.target as HTMLInputElement;
+    this.reportReason.set(inputElement.value);
+  }
+
+  updateReportDetails(event: Event) {
+    const inputElement = event.target as HTMLTextAreaElement;
+    this.reportDetails.set(inputElement.value);
+  }
+
+  startEdit() {
+    this.isEditing.set(true);
+    this.editTitle.set(this.post().title);
+    this.editContent.set(this.post().content);
+  }
+
+  cancelEdit() {
+    this.isEditing.set(false);
+  }
+
+  updateEditTitle(event: Event) {
+    this.editTitle.set((event.target as HTMLInputElement).value);
+  }
+
+  updateEditContent(event: Event) {
+    this.editContent.set((event.target as HTMLTextAreaElement).value);
+  }
+
+  saveEdit() {
+    const title = this.editTitle().trim();
+    const content = this.editContent().trim();
+    if (!title || !content || this.isSaving()) return;
+
+    this.isSaving.set(true);
+    this.postService.updatePost({ id: this.post().id, title, content }).subscribe({
+      next: () => {
+        // Update the post card display locally
+        (this.post() as any).title = title;
+        (this.post() as any).content = content;
+        this.isEditing.set(false);
+        this.isSaving.set(false);
+      },
+      error: () => {
+        this.isSaving.set(false);
+      },
+    });
+  }
+
+  submitReport() {
+    const reason = this.reportReason().trim();
+    const details = this.reportDetails().trim();
+
+    if (!reason || this.isSubmittingReport()) return;
+
+    this.isSubmittingReport.set(true);
+    this.reportFeedback.set(null);
+
+    this.postService
+      .reportPost(this.post().id, {
+        reason,
+        details: details || null,
+      })
+      .subscribe({
+        next: (res: ApiResponse<ReportResponse>) => {
+          this.reportFeedback.set({ type: 'success', message: 'Report submitted for review.' });
+          this.reportReason.set('');
+          this.reportDetails.set('');
+          this.isSubmittingReport.set(false);
+        },
+        error: (err) => {
+          const message = err?.error?.errors?.[0]?.message || 'Failed to submit this report.';
+          this.reportFeedback.set({ type: 'danger', message });
+          this.isSubmittingReport.set(false);
+        },
+      });
   }
 }

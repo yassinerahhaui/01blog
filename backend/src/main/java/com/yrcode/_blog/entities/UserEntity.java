@@ -73,9 +73,9 @@ public class UserEntity extends AbstractEntity implements UserDetails {
         return List.of(new SimpleGrantedAuthority(this.role.name()));
     }
 
-    @Formula("(SELECT COUNT(f.id) FROM follows f WHERE f.following_id = id)")
+    @Formula("(SELECT COUNT(*) FROM user_followers uf WHERE uf.user_id = id)")
     private Integer followersCount;
 
-    @Formula("(SELECT COUNT(f.id) FROM follows f WHERE f.follower_id = id)")
+    @Formula("(SELECT COUNT(*) FROM user_followers uf WHERE uf.follower_id = id)")
     private Integer followingCount;
 }
