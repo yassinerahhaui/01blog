@@ -39,11 +39,8 @@ public class ProfileServiceImpl implements ProfileService {
         int size = 20;
         Pageable pageable = PageRequest.of(page, size);
         UUID currentUserId = securityUtils.getCurrentUserId();
-        UserEntity currentUser = userRepo.findById(currentUserId)
-                .orElseThrow(() -> CustomResponseException.BadRequest("User not found!"));
-        boolean isAdmin = currentUser.getRole() == com.yrcode._blog.enums.Role.ADMIN;
 
-        Slice<PostEntity> posts = postRepo.findPostsByUserOrdered(userId, currentUserId, isAdmin, pageable);
+        Slice<PostEntity> posts = postRepo.findPostsByUserOrdered(userId, pageable);
         Slice<PostDetailsDTO> result = posts.map((PostEntity post)-> {
                     boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
                     return PostDetailsDTO.builder()

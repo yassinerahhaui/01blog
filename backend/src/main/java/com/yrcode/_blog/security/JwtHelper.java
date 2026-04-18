@@ -49,6 +49,7 @@ public class JwtHelper {
 
         if (userDetails instanceof UserEntity user) {
             extraClaims.put("userId", user.getId());
+            extraClaims.put("access", user.getAccess().name());
         }
 
         return Jwts

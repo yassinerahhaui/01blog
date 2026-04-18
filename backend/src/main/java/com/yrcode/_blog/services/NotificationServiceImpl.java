@@ -90,6 +90,28 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    public void notifyPostHiddenByAdmin(UUID postId) {
+        com.yrcode._blog.entities.PostEntity post = postRepo.findById(postId).orElse(null);
+        if (post == null) return;
+
+        String title = post.getTitle() == null ? "" : post.getTitle().trim();
+        String truncatedTitle = title.length() > 60 ? title.substring(0, 60) + "..." : title;
+        String message = truncatedTitle.isBlank()
+                ? "One of your posts has been hidden by an admin."
+                : "Your post \"" + truncatedTitle + "\" has been hidden by an admin.";
+
+        NotificationEntity notification = NotificationEntity.builder()
+                .userId(post.getUserId())
+                .message(message)
+                .type("POST_HIDDEN")
+                .referenceId(postId)
+                .isRead(false)
+                .build();
+
+        notificationRepo.save(notification);
+    }
+
+    @Override
     public void notifyLike(UUID likerId, UUID postId) {
         com.yrcode._blog.entities.PostEntity post = postRepo.findById(postId).orElse(null);
         UserEntity liker = userRepo.findById(likerId).orElse(null);

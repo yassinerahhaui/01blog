@@ -23,6 +23,56 @@
   border: 1px solid var(--border-color);
 }
 
+.media-live-preview {
+  border-top: 1px dashed var(--border-color);
+  padding-top: 0.85rem;
+}
+
+.media-preview-stage,
+.preview-media-shell {
+  background: rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--border-color);
+  border-radius: 0.85rem;
+}
+
+.post-preview-shell {
+  border: 1px solid var(--border-color);
+  background: var(--surface-elevated, #fff);
+}
+
+.post-preview-media {
+  border-radius: 0;
+  max-height: 28rem;
+  object-fit: cover;
+}
+
+.post-preview-title {
+  line-height: 1.1;
+}
+
+.preview-meta-pill {
+  border: 1px solid var(--border-color);
+  background: var(--surface-muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.preview-disabled-action {
+  pointer-events: none;
+}
+
+.preview-media {
+  display: block;
+  width: 100%;
+  max-height: 22rem;
+  object-fit: contain;
+  border-radius: 0.65rem;
+  background: #0f172a;
+}
+
 .preview-surface {
   min-height: 100%;
   background:

@@ -60,7 +60,7 @@ public class AdminController {
 
     @GetMapping("/posts")
     public ResponseEntity<GlobalResponse<List<PostDetailsDTO>>> findAllPosts() {
-        return ResponseEntity.ok(new GlobalResponse<>(postService.findAll()));
+        return ResponseEntity.ok(new GlobalResponse<>(postService.findAllForAdmin()));
     }
 
     @DeleteMapping("/posts/{postId}")

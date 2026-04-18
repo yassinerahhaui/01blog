@@ -55,11 +55,8 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> CustomResponseException.BadRequest("invalid post id!"));
 
         UUID currentUserId = securityUtils.getCurrentUserId();
-        UserEntity currentUser = userRepo.findById(currentUserId).orElse(null);
-        boolean isAdmin = currentUser != null && currentUser.getRole() == Role.ADMIN;
-
-        if (post.getIsHidden() && !isAdmin && !post.getUserId().equals(currentUserId)) {
-            throw CustomResponseException.NotFound("Post not found or has been hidden.");
+        if (Boolean.TRUE.equals(post.getIsHidden())) {
+            throw CustomResponseException.NotFound("This post has been hidden by admin.");
         }
 
         boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
@@ -83,13 +80,34 @@ public class PostServiceImpl implements PostService {
     public List<PostDetailsDTO> findAll() {
         List<PostEntity> posts = postRepo.findAll();
         UUID currentUserId = securityUtils.getCurrentUserId();
-        UserEntity currentUser = userRepo.findById(currentUserId)
-                .orElseThrow(() -> CustomResponseException.BadRequest("User not found!"));
-
-        boolean isAdmin = currentUser.getRole() == Role.ADMIN;
 
         return posts.stream()
-                .filter(post -> isAdmin || !post.getIsHidden() || post.getUserId().equals(currentUserId))
+                .filter(post -> !Boolean.TRUE.equals(post.getIsHidden()))
+                .map(post -> {
+                    boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
+                    return PostDetailsDTO.builder()
+                            .id(post.getId())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .mediaUrl(post.getMediaUrl())
+                            .mediaType(post.getMediaType())
+                            .userId(post.getUserId())
+                            .username(post.getUsername())
+                            .commentsCount(post.getCommentsCount())
+                            .likesCount(post.getLikesCount())
+                            .isLikedByMe(isLiked)
+                            .isHidden(post.getIsHidden())
+                            .createdAt(post.getCreatedAt())
+                            .build();
+                }).collect(toList());
+    }
+
+    @Override
+    public List<PostDetailsDTO> findAllForAdmin() {
+        List<PostEntity> posts = postRepo.findAll();
+        UUID currentUserId = securityUtils.getCurrentUserId();
+
+        return posts.stream()
                 .map(post -> {
                     boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
                     return PostDetailsDTO.builder()
@@ -250,8 +268,17 @@ public class PostServiceImpl implements PostService {
         PostEntity post = postRepo.findById(id)
                 .orElseThrow(() -> CustomResponseException.BadRequest("Invalid post id!"));
 
-        post.setIsHidden(!post.getIsHidden());
+        boolean wasHidden = Boolean.TRUE.equals(post.getIsHidden());
+        post.setIsHidden(!wasHidden);
         PostEntity savedPost = postRepo.save(post);
+
+        if (!wasHidden && Boolean.TRUE.equals(savedPost.getIsHidden())) {
+            try {
+                notificationService.notifyPostHiddenByAdmin(savedPost.getId());
+            } catch (Exception ignored) {
+                // Keep moderation action successful even if notification fails.
+            }
+        }
 
         UUID currentUserId = securityUtils.getCurrentUserId();
         boolean isLiked = reactionRepo.existsByPostIdAndUserId(savedPost.getId(), currentUserId);

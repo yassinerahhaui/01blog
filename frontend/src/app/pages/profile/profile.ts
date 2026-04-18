@@ -84,7 +84,7 @@ export class Profile implements OnInit {
     this.postService.getUserPosts(targetId, this.page()).subscribe({
       next: (res: ApiResponse<SliceResponse<Post>>) => {
         if (res.errors === null) {
-          const newPosts = res.data.content;
+          const newPosts = res.data.content.filter((post) => !post.isHidden);
 
           // Append new posts to the existing list
           this.posts.update(current => [...current, ...newPosts]);

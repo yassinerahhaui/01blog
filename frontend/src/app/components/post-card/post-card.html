@@ -22,23 +22,22 @@
       <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm rounded-3 post-menu">
         @if (post().userId === currentUser()?.userId) {
         <li>
-          <button type="button" class="dropdown-item fw-semibold post-menu-item post-menu-item-primary" (click)="startEdit()">
+          <button type="button" class="dropdown-item fw-semibold post-menu-item post-menu-item-primary"
+            (click)="startEdit()">
             <i class="fa-solid fa-pen-to-square me-2"></i> Edit
           </button>
         </li>
         <li>
-          <button type="button" class="dropdown-item fw-semibold post-menu-item post-menu-item-danger" (click)="confirmDelete()">
+          <button type="button" class="dropdown-item fw-semibold post-menu-item post-menu-item-danger"
+            (click)="confirmDelete()">
             <i class="fa-solid fa-trash me-2"></i> Delete
           </button>
         </li>
         }
         @else {
         <li>
-          <button
-            type="button"
-            class="dropdown-item fw-semibold post-menu-item post-menu-item-danger"
-            data-bs-toggle="modal"
-            [attr.data-bs-target]="'#reportPostModal-' + post().id">
+          <button type="button" class="dropdown-item fw-semibold post-menu-item post-menu-item-danger"
+            data-bs-toggle="modal" [attr.data-bs-target]="'#reportPostModal-' + post().id">
             <i class="fa-solid fa-flag me-2"></i> Report
           </button>
         </li>
@@ -53,15 +52,15 @@
     <!-- Title -->
     <div class="mb-3">
       <label class="form-label fw-semibold small text-muted mb-1">Title</label>
-      <input type="text" class="form-control rounded-3 fw-bold"
-        [value]="editTitle()" (input)="updateEditTitle($event)" placeholder="Post title">
+      <input type="text" class="form-control rounded-3 fw-bold" [value]="editTitle()" (input)="updateEditTitle($event)"
+        placeholder="Post title">
     </div>
 
     <!-- Content -->
     <div class="mb-3">
       <label class="form-label fw-semibold small text-muted mb-1">Content</label>
-      <textarea class="form-control rounded-3" rows="4"
-        [value]="editContent()" (input)="updateEditContent($event)" placeholder="Post content"></textarea>
+      <textarea class="form-control rounded-3" rows="4" [value]="editContent()" (input)="updateEditContent($event)"
+        placeholder="Post content"></textarea>
     </div>
 
     <!-- Media section -->
@@ -71,7 +70,8 @@
       @if (editMediaPreview()) {
       <div class="position-relative mb-2 rounded-3 overflow-hidden border" style="max-height:200px;">
         @if ((editFile()?.type ?? post().mediaType) === 'VIDEO' || editFile()?.type?.startsWith('video')) {
-        <video [src]="editMediaPreview()!" controls class="w-100 bg-dark" style="max-height:200px; object-fit:cover;"></video>
+        <video [src]="editMediaPreview()!" controls class="w-100 bg-dark"
+          style="max-height:200px; object-fit:cover;"></video>
         } @else {
         <img [src]="editMediaPreview()!" class="w-100" style="max-height:200px; object-fit:cover;" alt="Media preview">
         }
@@ -92,16 +92,16 @@
 
     <!-- Actions -->
     <div class="d-flex gap-2">
-      <button type="button" class="btn btn-sm btn-primary rounded-pill px-3"
-        [disabled]="isSaving() !== null" (click)="saveEdit()">
+      <button type="button" class="btn btn-sm btn-primary rounded-pill px-3" [disabled]="isSaving() !== null"
+        (click)="saveEdit()">
         @if (isSaving()) {
         <span class="spinner-border spinner-border-sm me-1" role="status"></span> Saving...
         } @else {
         Save
         }
       </button>
-      <button type="button" class="btn btn-sm btn-light rounded-pill px-3"
-        [disabled]="isSaving() !== null" (click)="cancelEdit()">Cancel</button>
+      <button type="button" class="btn btn-sm btn-light rounded-pill px-3" [disabled]="isSaving() !== null"
+        (click)="cancelEdit()">Cancel</button>
     </div>
   </div>
 
@@ -127,10 +127,10 @@
       <i class="fa-solid fa-triangle-exclamation me-1"></i> Delete this post?
     </span>
     <div class="d-flex gap-2">
-      <button type="button" class="btn btn-sm btn-light rounded-pill px-3"
-        [disabled]="isDeleting()" (click)="cancelDelete()">Cancel</button>
-      <button type="button" class="btn btn-sm btn-danger rounded-pill px-3"
-        [disabled]="isDeleting()" (click)="deletePost()">
+      <button type="button" class="btn btn-sm btn-light rounded-pill px-3" [disabled]="isDeleting()"
+        (click)="cancelDelete()">Cancel</button>
+      <button type="button" class="btn btn-sm btn-danger rounded-pill px-3" [disabled]="isDeleting()"
+        (click)="deletePost()">
         @if (isDeleting()) {
         <span class="spinner-border spinner-border-sm me-1" role="status"></span>
         } Confirm
@@ -181,34 +181,22 @@
 
         <div class="mb-3">
           <label class="form-label fw-semibold">Reason</label>
-          <input
-            type="text"
-            class="form-control rounded-4"
-            placeholder="Spam, abuse, plagiarism..."
-            [value]="reportReason()"
-            (input)="updateReportReason($event)"
-            [disabled]="isSubmittingReport()">
+          <input type="text" class="form-control rounded-4" placeholder="Spam, abuse, plagiarism..."
+            [value]="reportReason()" (input)="updateReportReason($event)" [disabled]="isSubmittingReport()">
         </div>
 
         <div>
           <label class="form-label fw-semibold">Details</label>
-          <textarea
-            class="form-control rounded-4"
-            rows="4"
-            placeholder="Add context for the moderation team"
-            [value]="reportDetails()"
-            (input)="updateReportDetails($event)"
+          <textarea class="form-control rounded-4" rows="4" placeholder="Add context for the moderation team"
+            [value]="reportDetails()" (input)="updateReportDetails($event)"
             [disabled]="isSubmittingReport()"></textarea>
         </div>
       </div>
 
       <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
         <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-        <button
-          type="button"
-          class="btn btn-danger rounded-pill px-4"
-          [disabled]="!reportReason().trim() || isSubmittingReport()"
-          (click)="submitReport()">
+        <button type="button" class="btn btn-danger rounded-pill px-4"
+          [disabled]="!reportReason().trim() || isSubmittingReport()" (click)="submitReport()">
           {{ isSubmittingReport() ? 'Submitting...' : 'Submit Report' }}
         </button>
       </div>
@@ -244,7 +232,8 @@
             <h6 class="fw-bold mb-1 small">{{ comment.username }}</h6>
             <p class="mb-0 small text-muted">{{ comment.content }}</p>
             @if (comment.mediaType === 'IMAGE') {
-            <img [src]="comment.mediaUrl" class="img-fluid rounded mt-2 object-fit-cover border" style="max-height: 200px;" alt="Comment media">
+            <img [src]="comment.mediaUrl" class="img-fluid rounded mt-2 object-fit-cover border"
+              style="max-height: 200px;" alt="Comment media">
             }
             @else if (comment.mediaType === 'VIDEO') {
             <video controls class="img-fluid rounded mt-2 bg-dark object-fit-cover border" style="max-height: 200px;">
@@ -265,26 +254,34 @@
         }
       </div>
 
-      <div class="modal-footer border-top-0 pt-2 pb-4 px-4 comment-footer rounded-bottom-4 flex-column align-items-stretch">
-        
+      <div
+        class="modal-footer border-top-0 pt-2 pb-4 px-4 comment-footer rounded-bottom-4 flex-column align-items-stretch">
+
         @if (commentMediaPreview()) {
         <div class="position-relative mb-2 align-self-start">
           @if (commentFile()?.type?.startsWith('video/')) {
-          <video [src]="commentMediaPreview()" class="rounded object-fit-cover border shadow-sm" style="height: 100px; width: 100px;"></video>
+          <video [src]="commentMediaPreview()" class="rounded object-fit-cover border shadow-sm"
+            style="height: 100px; width: 100px;"></video>
           } @else {
-          <img [src]="commentMediaPreview()" class="rounded object-fit-cover border shadow-sm" style="height: 100px; width: 100px;">
+          <img [src]="commentMediaPreview()" class="rounded object-fit-cover border shadow-sm"
+            style="height: 100px; width: 100px;">
           }
-          <button type="button" class="btn btn-sm btn-dark rounded-circle position-absolute top-0 end-0 m-1 opacity-75 shadow d-flex justify-content-center align-items-center" (click)="removeCommentMedia()" style="width: 24px; height: 24px; padding: 0;">
+          <button type="button"
+            class="btn btn-sm btn-dark rounded-circle position-absolute top-0 end-0 m-1 opacity-75 shadow d-flex justify-content-center align-items-center"
+            (click)="removeCommentMedia()" style="width: 24px; height: 24px; padding: 0;">
             <i class="fa-solid fa-xmark" style="font-size: 12px;"></i>
           </button>
         </div>
         }
 
         <div class="input-group">
-          
-          <input type="file" #commentFileInput class="d-none" accept="image/*,video/*" (change)="handleCommentFileChange($event)">
-          
-          <button type="button" class="btn btn-light rounded-circle shadow-sm me-2 d-flex justify-content-center align-items-center" style="width: 45px; height: 45px;" (click)="commentFileInput.click()" [disabled]="isSendingComment()">
+
+          <input type="file" #commentFileInput class="d-none" accept="image/*,video/*"
+            (change)="handleCommentFileChange($event)">
+
+          <button type="button"
+            class="btn btn-light rounded-circle shadow-sm me-2 d-flex justify-content-center align-items-center"
+            style="width: 45px; height: 45px;" (click)="commentFileInput.click()" [disabled]="isSendingComment()">
             <i class="fa-solid fa-image text-muted"></i>
           </button>
 

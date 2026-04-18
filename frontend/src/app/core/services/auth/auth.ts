@@ -35,8 +35,30 @@ export class Auth {
         } catch (error) {
           this.currentUser.set(null);
         }
+      } else {
+        this.currentUser.set(null);
       }
     }
+  }
+
+  isBlocked(): boolean {
+    return this.currentUser()?.access === 'BLOCKED';
+  }
+
+  markCurrentUserBlocked(): void {
+    const user = this.currentUser();
+    if (!user) {
+      return;
+    }
+
+    this.currentUser.set({ ...user, access: 'BLOCKED' });
+  }
+
+  logout(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+    }
+    this.currentUser.set(null);
   }
 
   login(userData: LoginRequest): Observable<ApiResponse<AuthResponse>> {

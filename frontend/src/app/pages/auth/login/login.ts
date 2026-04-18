@@ -24,6 +24,11 @@ export class Login {
     this.errorMessage.set(null);
     this.authService.login(this.loginData).subscribe({
       next: ()=> {
+        if (this.authService.isBlocked()) {
+          this.router.navigate(['/blocked']);
+          return;
+        }
+
         this.router.navigate(['/']);
       },
       error: (err) => {

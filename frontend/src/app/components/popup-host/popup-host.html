@@ -1,0 +1,30 @@
+@if (popup.state(); as state) {
+  <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-modal="true" (click)="onBackdropClick($event)">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header border-0 pb-1">
+          <h5 class="modal-title fw-bold">{{ state.title }}</h5>
+          <button type="button" class="btn-close" aria-label="Close" (click)="popup.onCancel()"></button>
+        </div>
+
+        <div class="modal-body pt-2">
+          <p class="mb-0 text-muted">{{ state.message }}</p>
+        </div>
+
+        <div class="modal-footer border-0 pt-1">
+          @if (state.kind === 'confirm') {
+            <button type="button" class="btn btn-light" (click)="popup.onCancel()">
+              {{ state.cancelText || 'Cancel' }}
+            </button>
+          }
+
+          <button type="button" class="btn" [ngClass]="'btn-' + state.confirmVariant" (click)="popup.onConfirm()">
+            {{ state.confirmText }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show popup-backdrop"></div>
+}

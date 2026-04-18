@@ -39,10 +39,40 @@
 
               <div class="mb-3 mb-md-0">
                 <label class="form-label fw-bold text-dark">Upload File (MinIO)</label>
-                <input type="file" class="form-control border-0 shadow-sm create-post-file-input"
+                <input #mediaInput type="file" class="form-control border-0 shadow-sm create-post-file-input"
                        (change)="onFileSelected($event)"
                        accept="image/*,video/*">
                 <small class="text-muted d-block mt-2">Select an image or video from your device.</small>
+
+                @if (selectedFileName(); as fileName) {
+                  <small class="d-block mt-2 text-primary fw-semibold">Selected: {{ fileName }}</small>
+                }
+
+                @if (mediaPreviewUrl(); as mediaUrl) {
+                  <div class="media-live-preview mt-3">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                      <span class="small fw-bold text-secondary">Live media preview</span>
+                      <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                                (click)="triggerMediaPicker(mediaInput)">
+                          Change
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3"
+                                (click)="removeSelectedMedia(mediaInput)">
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="media-preview-stage rounded-3 p-2">
+                      @if (isMediaVideo()) {
+                        <video [src]="mediaUrl" controls class="preview-media" preload="metadata"></video>
+                      } @else {
+                        <img [src]="mediaUrl" alt="Selected media preview" class="preview-media">
+                      }
+                    </div>
+                  </div>
+                }
               </div>
 
             </div>
@@ -73,23 +103,67 @@
         <div class="card-body p-4 p-md-5">
           <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
             <div>
-              <p class="text-uppercase small fw-bold text-primary mb-1">Live Preview</p>
-              <h3 class="h4 fw-bold text-dark mb-0">
-                {{ title().trim() || 'Untitled post' }}
-              </h3>
+              <p class="text-uppercase small fw-bold text-primary mb-1">Live Post Details Preview</p>
+              <h3 class="h5 fw-bold text-dark mb-0">How your post will appear on details page</h3>
             </div>
+            <span class="badge text-bg-primary rounded-pill px-3 py-2">Draft</span>
           </div>
 
-          <div class="preview-surface rounded-4 p-4">
-            @if (content().trim()) {
-              <div class="markdown-preview" [innerHTML]="renderedPreview()"></div>
-            } @else {
-              <div class="preview-empty text-center text-muted py-5">
-                <i class="fa-regular fa-pen-to-square fs-2 mb-3 d-block"></i>
-                Start writing on the left to see the Markdown preview here.
+          <article class="post-preview-shell rounded-4 overflow-hidden">
+            @if (mediaPreviewUrl(); as mediaUrl) {
+              <div class="preview-media-shell">
+                @if (isMediaVideo()) {
+                  <video [src]="mediaUrl" controls class="preview-media post-preview-media" preload="metadata"></video>
+                } @else {
+                  <img [src]="mediaUrl" alt="Post media preview" class="preview-media post-preview-media">
+                }
               </div>
             }
-          </div>
+
+            <div class="p-4 p-lg-5">
+              <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                <button type="button" class="btn btn-light rounded-pill px-3 preview-disabled-action">
+                  <i class="fa-solid fa-arrow-left me-2"></i>
+                  Back
+                </button>
+
+                <span class="btn btn-outline-primary rounded-pill px-3 preview-disabled-action">
+                  <i class="fa-regular fa-user me-2"></i>
+                  View author
+                </span>
+              </div>
+
+              <h2 class="fw-bold text-dark mb-2 post-preview-title">{{ title().trim() || 'Untitled post' }}</h2>
+
+              <div class="d-flex flex-wrap gap-2 mb-4">
+                <span class="preview-meta-pill">&#64;{{ previewAuthor() }}</span>
+                <span class="preview-meta-pill">{{ previewReadMinutes() }} min read</span>
+                <span class="preview-meta-pill">Just now</span>
+              </div>
+
+              <div class="preview-surface rounded-4 p-4">
+                @if (content().trim()) {
+                  <div class="markdown-preview" [innerHTML]="renderedPreview()"></div>
+                } @else {
+                  <div class="preview-empty text-center text-muted py-5">
+                    <i class="fa-regular fa-pen-to-square fs-2 mb-3 d-block"></i>
+                    Start writing on the left to see the post details preview here.
+                  </div>
+                }
+              </div>
+
+              <div class="d-flex flex-wrap gap-3 pt-3 mt-3 border-top">
+                <div class="btn btn-light rounded-pill px-4 py-2 border-0 shadow-sm preview-disabled-action">
+                  <i class="fa-regular fa-heart text-danger me-2"></i>
+                  0 likes
+                </div>
+                <div class="btn btn-light rounded-pill px-4 py-2 border-0 shadow-sm preview-disabled-action">
+                  <i class="fa-regular fa-comment text-primary me-2"></i>
+                  0 comments
+                </div>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </div>

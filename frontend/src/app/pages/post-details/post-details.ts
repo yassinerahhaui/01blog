@@ -45,8 +45,8 @@ export class PostDetails {
         return;
       }
 
+      this.comments.set([]);
       this.loadPost(postId);
-      this.loadComments(postId);
     });
   }
 
@@ -58,9 +58,18 @@ export class PostDetails {
       next: (res: ApiResponse<Post>) => {
         this.post.set(res.data);
         this.isLoading.set(false);
+        this.loadComments(postId);
       },
-      error: () => {
-        this.errorMessage.set('Failed to load this post.');
+      error: (err) => {
+        this.post.set(null);
+        const apiMessage = err?.error?.errors?.[0]?.message;
+
+        if (typeof apiMessage === 'string' && apiMessage.trim() !== '') {
+          this.errorMessage.set(apiMessage);
+        } else {
+          this.errorMessage.set('Failed to load this post.');
+        }
+
         this.isLoading.set(false);
       },
     });

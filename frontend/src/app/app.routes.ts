@@ -10,6 +10,7 @@ import { Dashboard } from './pages/dashboard/dashboard';
 import { adminGuard } from './core/guards/admin-guard';
 import { PostCreate } from './components/post-create/post-create';
 import { PostDetails } from './pages/post-details/post-details';
+import { Blocked } from './pages/auth/blocked/blocked';
 
 export const routes: Routes = [
   { path: '', component: Home, canActivate: [authGuard] },
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'post/create', component: PostCreate, canActivate: [authGuard] },
   { path: 'post/:id', component: PostDetails, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, adminGuard] },
+  { path: 'blocked', component: Blocked, canActivate: [authGuard] },
   { path: 'login', component: Login, canActivate: [notAuthGuard] },
   { path: 'register', component: Register, canActivate: [notAuthGuard] },
   { path: '**', component: NotFound },

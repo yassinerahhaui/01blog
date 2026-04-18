@@ -31,7 +31,7 @@ export class Navbar implements OnInit {
   }
 
   onLogout() {
-    localStorage.removeItem('token');
+    this.authService.logout();
     this.router.navigate(['/login']);
     this.isMenuCollapsed = true;
   }
@@ -68,7 +68,7 @@ export class Navbar implements OnInit {
 
   deleteNotification(event: Event, id: string) {
     event.stopPropagation();
-    
+
     const notification = this.notifService.items().find(n => n.id === id);
     const wasUnread = notification && !notification.isRead;
 

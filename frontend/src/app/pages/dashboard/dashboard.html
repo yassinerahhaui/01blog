@@ -402,22 +402,30 @@
             {{ report.details || 'No additional details were included with this report.' }}
           </p>
           <div class="report-meta mb-3">
-            <small class="text-muted">Target: 
+            <small class="text-muted">Target:
               <a [routerLink]="['/profile', report.targetId]" target="_blank" class="text-decoration-none fw-bold ms-1">
-                {{ report.targetId }}
+                {{ getReportedUser(report)?.username ? '@' + getReportedUser(report)?.username : report.targetId }}
                 <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
               </a>
             </small>
           </div>
           @if (report.status === 'OPEN') {
-          <div class="d-flex gap-2 border-top pt-3">
-            <button class="btn btn-sm btn-outline-warning rounded-pill px-3" (click)="banUserFromReport(report)">
-              Ban User
+          <div class="d-flex flex-wrap gap-2 border-top pt-3">
+            <button class="btn btn-sm btn-outline-warning rounded-pill px-3" [disabled]="!canModerateUserFromReport(report) || isUpdatingUserFromReport(report)" (click)="toggleUserAccessFromReport(report)">
+              {{ isUpdatingUserFromReport(report) ? 'Saving…' : getReportedUser(report)?.access === 'BLOCKED' ? 'Unban User' : 'Ban User' }}
             </button>
-            <button class="btn btn-sm btn-light rounded-pill px-3 ms-auto" (click)="dismissReport(report)">
-              Ignore
+            <button class="btn btn-sm btn-outline-danger rounded-pill px-3" [disabled]="!canModerateUserFromReport(report) || isDeletingUserFromReport(report)" (click)="deleteUserFromReport(report)">
+              {{ isDeletingUserFromReport(report) ? 'Deleting…' : 'Delete User' }}
+            </button>
+            <button class="btn btn-sm btn-light rounded-pill px-3 ms-auto" [disabled]="dismissingReportId() === report.id" (click)="removeUserReport(report)">
+              {{ dismissingReportId() === report.id ? 'Removing…' : 'Remove' }}
             </button>
           </div>
+          @if (!getReportedUser(report)) {
+          <small class="text-muted d-inline-block mt-2">Target user is already deleted.</small>
+          } @else if (!canModerateUserFromReport(report)) {
+          <small class="text-muted d-inline-block mt-2">Target user is protected from moderation.</small>
+          }
           }
         </article>
         } @empty {
@@ -453,7 +461,7 @@
             {{ report.details || 'No additional details were included with this report.' }}
           </p>
           <div class="report-meta mb-3">
-            <small class="text-muted">Target: 
+            <small class="text-muted">Target:
               <a [routerLink]="['/post', report.targetId]" target="_blank" class="text-decoration-none fw-bold ms-1">
                 {{ report.targetId }}
                 <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>

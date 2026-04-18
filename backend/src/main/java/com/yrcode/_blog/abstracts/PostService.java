@@ -12,6 +12,7 @@ import com.yrcode._blog.dtos.post.PostUpdateDTO;
 public interface PostService {
     PostDetailsDTO findOne(UUID id);
     List<PostDetailsDTO> findAll();
+    List<PostDetailsDTO> findAllForAdmin();
     PostDetailsDTO createOne(PostCreateDTO data, MultipartFile file);
     void deleteOne(UUID id);
     PostDetailsDTO updateOne(PostUpdateDTO data, MultipartFile file);

@@ -10,6 +10,7 @@ public interface NotificationService {
     void markAsRead(UUID notificationId, UUID userId);
     void markAllAsRead(UUID userId);
     void notifyFollowers(UUID authorId, UUID postId, String postTitle);
+    void notifyPostHiddenByAdmin(UUID postId);
     void notifyLike(UUID likerId, UUID postId);
     void notifyComment(UUID commenterId, UUID postId);
     void notifyFollow(UUID followerId, UUID followedId);

@@ -46,7 +46,7 @@ export class Home implements OnInit {
     this.postService.getFeed(this.page(), 20).subscribe({
       next: (res: ApiResponse<SliceResponse<Post>>) => {
         if (res.errors === null) {
-          const newPosts = res.data.content;
+          const newPosts = res.data.content.filter((post) => !post.isHidden);
           this.posts.update(current => [...current, ...newPosts]);
           this.page.update(p => p + 1);
           this.hasMore.set(!res.data.last);

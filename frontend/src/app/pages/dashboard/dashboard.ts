@@ -8,6 +8,7 @@ import { Auth } from '../../core/services/auth/auth';
 import { UserInfo } from '../../core/models/user-info';
 import { Post } from '../../core/models/post';
 import { AdminReport } from '../../core/models/admin-report';
+import { Popup } from '../../core/services/popup/popup';
 
 type SidebarSection = 'overview' | 'users' | 'posts' | 'user-reports' | 'post-reports';
 
@@ -21,6 +22,7 @@ type SidebarSection = 'overview' | 'users' | 'posts' | 'user-reports' | 'post-re
 export class Dashboard implements OnInit {
   private adminService = inject(Admin);
   private authService = inject(Auth);
+  private popup = inject(Popup);
 
   activeSection = signal<SidebarSection>('overview');
   sidebarOpen = signal(false);
@@ -36,6 +38,7 @@ export class Dashboard implements OnInit {
   deletingUserId = signal<string | null>(null);
   deletingPostId = signal<string | null>(null);
   hidingPostId = signal<string | null>(null);
+  dismissingReportId = signal<string | null>(null);
 
   currentUserId = computed(() => this.authService.currentUser()?.userId ?? null);
   totalOpenReports = computed(() => this.reports().filter((report) => report.status === 'OPEN').length);
@@ -135,11 +138,18 @@ export class Dashboard implements OnInit {
     this.searchTerm.set(input.value);
   }
 
-  toggleUserAccess(user: UserInfo) {
+  async toggleUserAccess(user: UserInfo) {
     const nextAccess = user.access === 'BLOCKED' ? 'ENABLED' : 'BLOCKED';
     const actionLabel = nextAccess === 'BLOCKED' ? 'ban' : 'unban';
 
-    if (typeof window !== 'undefined' && !window.confirm(`Do you want to ${actionLabel} @${user.username}?`)) {
+    const confirmed = await this.popup.confirm({
+      title: `${actionLabel === 'ban' ? 'Ban' : 'Unban'} user`,
+      message: `Do you want to ${actionLabel} @${user.username}?`,
+      confirmText: actionLabel === 'ban' ? 'Ban user' : 'Unban user',
+      confirmVariant: actionLabel === 'ban' ? 'warning' : 'success',
+    });
+
+    if (!confirmed) {
       return;
     }
 
@@ -157,8 +167,15 @@ export class Dashboard implements OnInit {
     });
   }
 
-  deleteUser(user: UserInfo) {
-    if (typeof window !== 'undefined' && !window.confirm(`Delete @${user.username} and their account data?`)) {
+  async deleteUser(user: UserInfo) {
+    const confirmed = await this.popup.confirm({
+      title: 'Delete user',
+      message: `Delete @${user.username} and their account data?`,
+      confirmText: 'Delete user',
+      confirmVariant: 'danger',
+    });
+
+    if (!confirmed) {
       return;
     }
 
@@ -174,8 +191,15 @@ export class Dashboard implements OnInit {
     });
   }
 
-  deletePost(post: Post) {
-    if (typeof window !== 'undefined' && !window.confirm(`Remove the post "${post.title}"?`)) {
+  async deletePost(post: Post) {
+    const confirmed = await this.popup.confirm({
+      title: 'Delete post',
+      message: `Remove the post "${post.title}"?`,
+      confirmText: 'Delete post',
+      confirmVariant: 'danger',
+    });
+
+    if (!confirmed) {
       return;
     }
 
@@ -191,8 +215,16 @@ export class Dashboard implements OnInit {
     });
   }
 
-  hidePost(post: Post) {
-    if (typeof window !== 'undefined' && !window.confirm(`${post.isHidden ? 'Unhide' : 'Hide'} the post "${post.title}"?`)) {
+  async hidePost(post: Post) {
+    const isUnhide = post.isHidden;
+    const confirmed = await this.popup.confirm({
+      title: isUnhide ? 'Unhide post' : 'Hide post',
+      message: `${isUnhide ? 'Unhide' : 'Hide'} the post "${post.title}"?`,
+      confirmText: isUnhide ? 'Unhide post' : 'Hide post',
+      confirmVariant: isUnhide ? 'success' : 'warning',
+    });
+
+    if (!confirmed) {
       return;
     }
 
@@ -210,51 +242,138 @@ export class Dashboard implements OnInit {
     });
   }
 
-  dismissReport(report: AdminReport) {
-    if (typeof window !== 'undefined' && !window.confirm(`Dismiss this report?`)) {
+  async dismissReport(report: AdminReport, removeFromQueue = false) {
+    const confirmed = await this.popup.confirm({
+      title: removeFromQueue ? 'Remove report' : 'Dismiss report',
+      message: removeFromQueue ? 'Remove this report from the moderation queue?' : 'Dismiss this report?',
+      confirmText: removeFromQueue ? 'Remove report' : 'Dismiss report',
+      confirmVariant: removeFromQueue ? 'secondary' : 'warning',
+    });
+
+    if (!confirmed) {
       return;
     }
 
+    this.dismissingReportId.set(report.id);
     this.adminService.dismissReport(report.id).subscribe({
       next: () => {
-        this.reports.update((current) =>
-          current.map((item) => (item.id === report.id ? { ...item, status: 'REVIEWED' } : item)),
-        );
+        this.reports.update((current) => {
+          if (removeFromQueue) {
+            return current.filter((item) => item.id !== report.id);
+          }
+
+          return current.map((item) => (item.id === report.id ? { ...item, status: 'REVIEWED' } : item));
+        });
+        this.dismissingReportId.set(null);
       },
       error: () => {
-        // Handle error
+        this.dismissingReportId.set(null);
       },
     });
   }
 
-  banUserFromReport(report: AdminReport) {
-    const user = this.users().find((u) => u.id === report.targetId);
-    if (user && user.access !== 'BLOCKED') {
-      this.toggleUserAccess(user);
-    } else if (!user) {
-      alert('User not found.');
+  getReportedUser(report: AdminReport): UserInfo | undefined {
+    return this.users().find((user) => user.id === report.targetId);
+  }
+
+  canModerateUser(user: UserInfo): boolean {
+    return this.currentUserId() !== user.id && user.role !== 'ADMIN';
+  }
+
+  canModerateUserFromReport(report: AdminReport): boolean {
+    const user = this.getReportedUser(report);
+    return !!user && this.canModerateUser(user);
+  }
+
+  isUpdatingUserFromReport(report: AdminReport): boolean {
+    const user = this.getReportedUser(report);
+    return !!user && this.processingUserId() === user.id;
+  }
+
+  isDeletingUserFromReport(report: AdminReport): boolean {
+    const user = this.getReportedUser(report);
+    return !!user && this.deletingUserId() === user.id;
+  }
+
+  async toggleUserAccessFromReport(report: AdminReport) {
+    const user = this.getReportedUser(report);
+
+    if (!user) {
+      await this.popup.alert({
+        title: 'User unavailable',
+        message: 'User not found or already deleted.',
+        confirmVariant: 'warning',
+      });
+      return;
     }
+
+    if (!this.canModerateUser(user)) {
+      await this.popup.alert({
+        title: 'Action not allowed',
+        message: 'This account is protected and cannot be moderated.',
+        confirmVariant: 'warning',
+      });
+      return;
+    }
+
+    await this.toggleUserAccess(user);
+  }
+
+  async deleteUserFromReport(report: AdminReport) {
+    const user = this.getReportedUser(report);
+
+    if (!user) {
+      await this.popup.alert({
+        title: 'User unavailable',
+        message: 'User not found or already deleted.',
+        confirmVariant: 'warning',
+      });
+      return;
+    }
+
+    if (!this.canModerateUser(user)) {
+      await this.popup.alert({
+        title: 'Action not allowed',
+        message: 'This account is protected and cannot be moderated.',
+        confirmVariant: 'warning',
+      });
+      return;
+    }
+
+    await this.deleteUser(user);
+  }
+
+  async removeUserReport(report: AdminReport) {
+    await this.dismissReport(report, true);
   }
 
   getPost(postId: string): Post | undefined {
     return this.posts().find((p) => p.id === postId);
   }
 
-  deletePostFromReport(report: AdminReport) {
+  async deletePostFromReport(report: AdminReport) {
     const post = this.posts().find((p) => p.id === report.targetId);
     if (post) {
-      this.deletePost(post);
+      await this.deletePost(post);
     } else {
-      alert('Post not found or already deleted.');
+      await this.popup.alert({
+        title: 'Post unavailable',
+        message: 'Post not found or already deleted.',
+        confirmVariant: 'warning',
+      });
     }
   }
 
-  hidePostFromReport(report: AdminReport) {
+  async hidePostFromReport(report: AdminReport) {
     const post = this.posts().find((p) => p.id === report.targetId);
     if (post) {
-      this.hidePost(post);
+      await this.hidePost(post);
     } else {
-      alert('Post not found.');
+      await this.popup.alert({
+        title: 'Post unavailable',
+        message: 'Post not found.',
+        confirmVariant: 'warning',
+      });
     }
   }
 }
