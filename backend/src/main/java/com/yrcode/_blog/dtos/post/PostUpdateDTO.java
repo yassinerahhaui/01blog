@@ -6,12 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record PostUpdateDTO(
-    @NotNull(message = "Post id is required")
-    UUID id,
+        @NotNull(message = "Post id is required") UUID id,
 
-    @NotBlank(message = "Title is required")
-    String title,
+        @NotBlank(message = "Title is required") String title,
 
-    @NotBlank(message = "Content is required")
-    String content
-) {}
+        @NotBlank(message = "Content is required") String content,
+
+        Boolean removeMedia) {
+}

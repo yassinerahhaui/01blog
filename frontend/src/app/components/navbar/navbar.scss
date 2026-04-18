@@ -64,6 +64,10 @@
   }
 }
 
+.pointer {
+  cursor: pointer;
+}
+
 .notif-badge {
   position: absolute;
   top: -4px;
@@ -96,9 +100,13 @@
   box-shadow: 0 16px 48px var(--shadow-color);
   z-index: 1070;
   overflow: hidden;
-  display: flex;
+  display: none; /* Let bootstrap handle display */
   flex-direction: column;
-  animation: notif-slide 0.2s ease;
+
+  &.show {
+    display: flex;
+    animation: notif-slide 0.2s ease;
+  }
 }
 
 @keyframes notif-slide {
@@ -202,12 +210,7 @@
   }
 }
 
-/* Invisible backdrop to close dropdown on outside click */
-.notif-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 1060;
-}
+
 
 @media (max-width: 575.98px) {
   .notif-dropdown {

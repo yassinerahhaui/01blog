@@ -55,3 +55,17 @@
     color: var(--text-secondary) !important;
   }
 }
+
+/* ── Delete confirmation bar ─────────────────────────── */
+
+.delete-confirm-bar {
+  background: var(--surface-muted);
+  border-top: 1px solid rgba(220, 53, 69, 0.25);
+  border-left: 3px solid #dc3545;
+  animation: fadeInBar 0.15s ease;
+}
+
+@keyframes fadeInBar {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

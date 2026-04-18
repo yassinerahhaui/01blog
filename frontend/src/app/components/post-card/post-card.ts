@@ -1,4 +1,4 @@
-import { Component, effect, inject, input, OnInit, signal } from '@angular/core';
+import { Component, effect, inject, input, OnInit, output, signal } from '@angular/core';
 import { Post } from '../../core/models/post';
 import { Comment } from '../../core/models/comment';
 import { CommonModule } from '@angular/common';
@@ -33,6 +33,8 @@ export class PostCard implements OnInit {
   isLoadingComments = signal<boolean>(false);
   isSendingComment = signal<boolean>(false);
   newCommentText = signal<string>('');
+  commentFile = signal<File | null>(null);
+  commentMediaPreview = signal<string | null>(null);
   reportReason = signal<string>('');
   reportDetails = signal<string>('');
   isSubmittingReport = signal<boolean>(false);
@@ -42,7 +44,15 @@ export class PostCard implements OnInit {
   isEditing = signal<boolean>(false);
   editTitle = signal<string>('');
   editContent = signal<string>('');
-  isSaving = signal<boolean>(false);
+  isSaving = signal<string | null>(null);
+  editFile = signal<File | null>(null);
+  editMediaPreview = signal<string | null>(null);
+  removeMedia = signal<boolean>(false);
+
+  // Delete state
+  postDeleted = output<string>();
+  isConfirmingDelete = signal<boolean>(false);
+  isDeleting = signal<boolean>(false);
 
   constructor() {
     effect(() => {
@@ -97,11 +107,13 @@ export class PostCard implements OnInit {
 
     this.isSendingComment.set(true);
 
-    this.postService.addComment(this.post().id, text).subscribe({
+    this.postService.addComment(this.post().id, text, this.commentFile()).subscribe({
       next: (res: any) => {
         this.comments.update(current => [res.data, ...current]);
         this.post().commentsCount++;
         this.newCommentText.set('');
+        this.commentFile.set(null);
+        this.commentMediaPreview.set(null);
         this.isSendingComment.set(false);
       },
       error: (err) => {
@@ -109,6 +121,23 @@ export class PostCard implements OnInit {
         this.isSendingComment.set(false);
       }
     });
+  }
+
+  handleCommentFileChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    this.commentFile.set(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => this.commentMediaPreview.set(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      this.commentMediaPreview.set(null);
+    }
+  }
+
+  removeCommentMedia() {
+    this.commentFile.set(null);
+    this.commentMediaPreview.set(null);
   }
 
   updateCommentText(event: Event) {
@@ -127,13 +156,20 @@ export class PostCard implements OnInit {
   }
 
   startEdit() {
-    this.isEditing.set(true);
     this.editTitle.set(this.post().title);
     this.editContent.set(this.post().content);
+    this.editFile.set(null);
+    this.editMediaPreview.set(this.post().mediaUrl ?? null);
+    this.removeMedia.set(false);
+    this.isSaving.set(null);
+    this.isEditing.set(true);
   }
 
   cancelEdit() {
     this.isEditing.set(false);
+    this.editFile.set(null);
+    this.editMediaPreview.set(null);
+    this.removeMedia.set(false);
   }
 
   updateEditTitle(event: Event) {
@@ -144,22 +180,71 @@ export class PostCard implements OnInit {
     this.editContent.set((event.target as HTMLTextAreaElement).value);
   }
 
+  handleFileChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    this.editFile.set(file);
+    this.removeMedia.set(false);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => this.editMediaPreview.set(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      this.editMediaPreview.set(this.post().mediaUrl ?? null);
+    }
+  }
+
+  removeEditMedia() {
+    this.editFile.set(null);
+    this.editMediaPreview.set(null);
+    this.removeMedia.set(true);
+  }
+
   saveEdit() {
     const title = this.editTitle().trim();
     const content = this.editContent().trim();
-    if (!title || !content || this.isSaving()) return;
+    if (!title || !content || this.isSaving() !== null) return;
 
-    this.isSaving.set(true);
-    this.postService.updatePost({ id: this.post().id, title, content }).subscribe({
-      next: () => {
-        // Update the post card display locally
-        (this.post() as any).title = title;
-        (this.post() as any).content = content;
+    this.isSaving.set('saving');
+    this.postService.updatePost(
+      { id: this.post().id, title, content, removeMedia: this.removeMedia() },
+      this.editFile()
+    ).subscribe({
+      next: (res: ApiResponse<Post>) => {
+        const updated = res.data;
+        (this.post() as any).title = updated.title;
+        (this.post() as any).content = updated.content;
+        (this.post() as any).mediaUrl = updated.mediaUrl;
+        (this.post() as any).mediaType = updated.mediaType;
         this.isEditing.set(false);
-        this.isSaving.set(false);
+        this.editFile.set(null);
+        this.editMediaPreview.set(null);
+        this.removeMedia.set(false);
+        this.isSaving.set(null);
       },
       error: () => {
-        this.isSaving.set(false);
+        this.isSaving.set(null);
+      },
+    });
+  }
+
+  confirmDelete() {
+    this.isConfirmingDelete.set(true);
+  }
+
+  cancelDelete() {
+    this.isConfirmingDelete.set(false);
+  }
+
+  deletePost() {
+    if (this.isDeleting()) return;
+    this.isDeleting.set(true);
+    this.postService.deletePost(this.post().id).subscribe({
+      next: () => {
+        this.postDeleted.emit(this.post().id);
+      },
+      error: () => {
+        this.isDeleting.set(false);
+        this.isConfirmingDelete.set(false);
       },
     });
   }

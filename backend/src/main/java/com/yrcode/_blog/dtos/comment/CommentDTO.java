@@ -7,5 +7,7 @@ import lombok.Builder;
 public record CommentDTO(
     UUID id,
     String content,
-    String username
+    String username,
+    String mediaUrl,
+    com.yrcode._blog.enums.MediaType mediaType
 ) {}

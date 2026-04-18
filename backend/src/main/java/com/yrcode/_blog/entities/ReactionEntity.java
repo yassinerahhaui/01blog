@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "reactions", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"post_id", "user_id"})
+        @UniqueConstraint(columnNames = { "post_id", "user_id" })
 })
 @Getter
 @Setter

@@ -14,4 +14,7 @@ public interface FollowRepo extends JpaRepository<FollowEntity, UUID> {
 
     @Query("SELECT COUNT(f) > 0 FROM FollowEntity f WHERE f.follower.id = :followerId AND f.following.id = :followingId")
     boolean existsByFollowerIdAndFollowingId(@Param("followerId") UUID followerId, @Param("followingId") UUID followingId);
+
+    @Query("SELECT f.follower FROM FollowEntity f WHERE f.following.id = :followingId")
+    java.util.List<com.yrcode._blog.entities.UserEntity> findFollowersByFollowingId(@Param("followingId") UUID followingId);
 }

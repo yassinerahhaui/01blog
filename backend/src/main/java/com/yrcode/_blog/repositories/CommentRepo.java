@@ -8,4 +8,8 @@ import java.util.UUID;
 public interface CommentRepo extends JpaRepository<CommentEntity, UUID> {
     // Find comments by post ID, ordered by the newest first
     List<CommentEntity> findByPost_IdOrderByCreatedAtDesc(UUID postId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM CommentEntity c WHERE c.post.id = :postId")
+    void deleteByPostId(@org.springframework.data.repository.query.Param("postId") UUID postId);
 }

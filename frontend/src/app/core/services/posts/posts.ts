@@ -21,6 +21,12 @@ export class Posts {
     return this.http.get<ApiResponse<Post[]>>(`${this.apiUrl}/post/all`);
   }
 
+  getFeed(page: number = 0, size: number = 20): Observable<ApiResponse<SliceResponse<Post>>> {
+    return this.http.get<ApiResponse<SliceResponse<Post>>>(
+      `${this.apiUrl}/post/feed?page=${page}&size=${size}`
+    );
+  }
+
   getById(postId: string): Observable<ApiResponse<Post>> {
     return this.http.get<ApiResponse<Post>>(`${this.apiUrl}/post/${postId}`);
   }
@@ -41,8 +47,13 @@ export class Posts {
   }
 
   // Add a new comment to a post
-  addComment(postId: string, content: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/post/${postId}/comments`, { content });
+  addComment(postId: string, content: string, file?: File | null): Observable<any> {
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify({ content })], { type: 'application/json' }));
+    if (file) {
+      formData.append('file', file);
+    }
+    return this.http.post(`${this.apiUrl}/post/${postId}/comments`, formData);
   }
 
   toggleLike(postId: string): Observable<ApiResponse<Like>> {
@@ -53,7 +64,16 @@ export class Posts {
     return this.http.post<ApiResponse<ReportResponse>>(`${this.apiUrl}/post/${postId}/report`, payload);
   }
 
-  updatePost(post: { id: string; title: string; content: string }): Observable<ApiResponse<Post>> {
-    return this.http.put<ApiResponse<Post>>(`${this.apiUrl}/post/update`, post);
+  updatePost(post: { id: string; title: string; content: string; removeMedia?: boolean }, file?: File | null): Observable<ApiResponse<Post>> {
+    const formData = new FormData();
+    formData.append('data', new Blob([JSON.stringify(post)], { type: 'application/json' }));
+    if (file) {
+      formData.append('file', file);
+    }
+    return this.http.put<ApiResponse<Post>>(`${this.apiUrl}/post/update`, formData);
+  }
+
+  deletePost(postId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/post/${postId}`);
   }
 }

@@ -20,6 +20,8 @@ public class FollowServiceImpl implements FollowService {
     private final UserRepo userRepo;
     private final SecurityUtils securityUtils;
 
+    private final com.yrcode._blog.abstracts.NotificationService notificationService;
+
     @Override
     @Transactional
     public Boolean toggleFollow(UUID targetUserId) {
@@ -40,6 +42,14 @@ public class FollowServiceImpl implements FollowService {
                             .orElseThrow(() -> CustomResponseException.NotFound("User to follow not found"));
                     
                     followRepo.save(FollowEntity.builder().follower(follower).following(following).build());
+                    
+                    // Notify the followed user
+                    try {
+                        notificationService.notifyFollow(currentUserId, targetUserId);
+                    } catch (Exception e) {
+                        // Ignore notification errors
+                    }
+                    
                     return true; // followed
                 });
     }

@@ -1,7 +1,6 @@
 package com.yrcode._blog.services;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,9 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private com.yrcode._blog.repositories.PostRepo postRepo;
 
     @Override
     public List<NotificationDTO> getUserNotifications(UUID userId) {
@@ -59,12 +61,13 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepo.markAllAsRead(userId);
     }
 
+
     @Override
     public void notifyFollowers(UUID authorId, UUID postId, String postTitle) {
         UserEntity author = userRepo.findById(authorId)
                 .orElseThrow(() -> CustomResponseException.NotFound("Author not found!"));
 
-        Set<UserEntity> followers = author.getFollowers();
+        java.util.Set<UserEntity> followers = author.getFollowers();
         if (followers.isEmpty()) return;
 
         String truncatedTitle = postTitle.length() > 60
@@ -84,6 +87,63 @@ public class NotificationServiceImpl implements NotificationService {
         }
 
         notificationRepo.saveAll(notifications);
+    }
+
+    @Override
+    public void notifyLike(UUID likerId, UUID postId) {
+        com.yrcode._blog.entities.PostEntity post = postRepo.findById(postId).orElse(null);
+        UserEntity liker = userRepo.findById(likerId).orElse(null);
+        
+        if (post == null || liker == null || post.getUserId().equals(likerId)) return;
+        
+        String message = "@" + liker.getUsername() + " liked your post.";
+        
+        NotificationEntity notification = NotificationEntity.builder()
+                .userId(post.getUserId())
+                .message(message)
+                .type("LIKE")
+                .referenceId(postId)
+                .isRead(false)
+                .build();
+        notificationRepo.save(notification);
+    }
+
+    @Override
+    public void notifyComment(UUID commenterId, UUID postId) {
+        com.yrcode._blog.entities.PostEntity post = postRepo.findById(postId).orElse(null);
+        UserEntity commenter = userRepo.findById(commenterId).orElse(null);
+        
+        if (post == null || commenter == null || post.getUserId().equals(commenterId)) return;
+        
+        String message = "@" + commenter.getUsername() + " commented on your post.";
+        
+        NotificationEntity notification = NotificationEntity.builder()
+                .userId(post.getUserId())
+                .message(message)
+                .type("COMMENT")
+                .referenceId(postId)
+                .isRead(false)
+                .build();
+        notificationRepo.save(notification);
+    }
+
+    @Override
+    public void notifyFollow(UUID followerId, UUID followedId) {
+        UserEntity follower = userRepo.findById(followerId).orElse(null);
+        UserEntity followed = userRepo.findById(followedId).orElse(null);
+        
+        if (follower == null || followed == null || followerId.equals(followedId)) return;
+        
+        String message = "@" + follower.getUsername() + " started following you.";
+        
+        NotificationEntity notification = NotificationEntity.builder()
+                .userId(followedId)
+                .message(message)
+                .type("FOLLOW")
+                .referenceId(followerId)
+                .isRead(false)
+                .build();
+        notificationRepo.save(notification);
     }
 
     @Override

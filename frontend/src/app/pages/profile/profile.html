@@ -15,7 +15,8 @@
     @for (p of posts(); track p.id) {
       <div class="col-xl-4 col-md-6 mb-4">
         <app-post-card
-          [post]="p">
+          [post]="p"
+          (postDeleted)="onPostDeleted($event)">
         </app-post-card>
       </div>
     }

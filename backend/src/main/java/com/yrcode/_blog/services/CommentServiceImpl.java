@@ -30,6 +30,9 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepo postRepo;
     private final UserRepo userRepo;
     private final SecurityUtils securityUtils;
+    private final FileStorageService fileStorageService;
+
+    private final com.yrcode._blog.abstracts.NotificationService notificationService;
 
     // Helper method to map Entity to DTO
     private CommentDTO mapToCommentDTO(CommentEntity entity) {
@@ -37,6 +40,8 @@ public class CommentServiceImpl implements CommentService {
                 .id(entity.getId())
                 .content(entity.getContent())
                 .username(entity.getUsername())
+                .mediaUrl(entity.getMediaUrl())
+                .mediaType(entity.getMediaType())
                 .build();
     }
 
@@ -52,7 +57,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentDTO addComment(UUID postId, CommentRequestDTO requestDTO) {
+    public CommentDTO addComment(UUID postId, CommentRequestDTO requestDTO,
+            org.springframework.web.multipart.MultipartFile file) {
         // 1. Get current logged-in user
         UUID currentUserId = securityUtils.getCurrentUserId();
         UserEntity currentUser = userRepo.findById(currentUserId)
@@ -62,16 +68,34 @@ public class CommentServiceImpl implements CommentService {
         PostEntity targetPost = postRepo.findById(postId)
                 .orElseThrow(() -> CustomResponseException.NotFound("Post not found"));
 
-        // 3. Create and save the new comment
+        // 3. Handle optional file upload
+        String mediaUrl = null;
+        com.yrcode._blog.enums.MediaType mediaType = com.yrcode._blog.enums.MediaType.EMPTY;
+
+        if (file != null && !file.isEmpty()) {
+            mediaUrl = fileStorageService.uploadFile(file);
+            mediaType = com.yrcode._blog.enums.MediaType.fromString(file.getContentType());
+        }
+
+        // 4. Create and save the new comment
         CommentEntity newComment = CommentEntity.builder()
                 .content(requestDTO.content())
                 .post(targetPost)
                 .user(currentUser)
+                .mediaUrl(mediaUrl)
+                .mediaType(mediaType)
                 .build();
 
         CommentEntity savedComment = commentRepo.save(newComment);
 
-        // 4. Return the saved comment as DTO to update the frontend instantly
+        // Notify the post owner
+        try {
+            notificationService.notifyComment(currentUserId, postId);
+        } catch (Exception e) {
+            // Ignore notification errors
+        }
+
+        // 5. Return the saved comment as DTO to update the frontend instantly
         return mapToCommentDTO(savedComment);
     }
 }

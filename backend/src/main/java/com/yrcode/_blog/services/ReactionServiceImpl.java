@@ -28,6 +28,8 @@ public class ReactionServiceImpl implements ReactionService {
     private final UserRepo userRepo;
     private final SecurityUtils securityUtils;
 
+    private final com.yrcode._blog.abstracts.NotificationService notificationService;
+
     @Override
     @Transactional
     public String toggleReaction(UUID postId) {
@@ -50,6 +52,14 @@ public class ReactionServiceImpl implements ReactionService {
                     .build();
 
             reactionRepo.save(newReaction);
+            
+            // Notify the post owner
+            try {
+                notificationService.notifyLike(currentUserId, postId);
+            } catch (Exception e) {
+                // Ignore notification errors
+            }
+            
             return "Liked";
         }
     }

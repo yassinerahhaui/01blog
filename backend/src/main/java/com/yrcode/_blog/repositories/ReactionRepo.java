@@ -15,4 +15,8 @@ public interface ReactionRepo extends JpaRepository<ReactionEntity, UUID> {
 
     @Query("SELECT COUNT(r) > 0 FROM ReactionEntity r WHERE r.post.id = :postId AND r.user.id = :userId")
     boolean existsByPostIdAndUserId(@Param("postId") UUID postId, @Param("userId") UUID userId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("DELETE FROM ReactionEntity r WHERE r.post.id = :postId")
+    void deleteByPostId(@Param("postId") UUID postId);
 }

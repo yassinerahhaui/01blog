@@ -69,26 +69,47 @@
             }
           </div>
 
-          <div class="comment-composer d-flex gap-2 mb-4">
-            <input
-              type="text"
-              class="form-control border-0 shadow-none rounded-pill px-4 py-3 comment-input"
-              placeholder="Write a comment..."
-              [value]="newCommentText()"
-              [disabled]="isSendingComment()"
-              (input)="updateCommentText($event)"
-              (keyup.enter)="submitComment()" />
-            <button
-              type="button"
-              class="btn btn-primary rounded-circle composer-btn"
-              [disabled]="!newCommentText().trim() || isSendingComment()"
-              (click)="submitComment()">
-              @if (isSendingComment()) {
-                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <div class="comment-composer d-flex flex-column gap-2 mb-4">
+            
+            @if (commentMediaPreview()) {
+            <div class="position-relative mb-2 align-self-start">
+              @if (commentFile()?.type?.startsWith('video/')) {
+              <video [src]="commentMediaPreview()" class="rounded object-fit-cover border shadow-sm" style="height: 100px; width: 100px;"></video>
               } @else {
-                <i class="fa-solid fa-paper-plane"></i>
+              <img [src]="commentMediaPreview()" class="rounded object-fit-cover border shadow-sm" style="height: 100px; width: 100px;">
               }
-            </button>
+              <button type="button" class="btn btn-sm btn-dark rounded-circle position-absolute top-0 end-0 m-1 opacity-75 shadow d-flex justify-content-center align-items-center" (click)="removeCommentMedia()" style="width: 24px; height: 24px; padding: 0;">
+                <i class="fa-solid fa-xmark" style="font-size: 12px;"></i>
+              </button>
+            </div>
+            }
+
+            <div class="d-flex gap-2 w-100">
+              <input type="file" #commentFileInput class="d-none" accept="image/*,video/*" (change)="handleCommentFileChange($event)">
+              <button type="button" class="btn btn-light rounded-circle shadow-sm d-flex justify-content-center align-items-center flex-shrink-0" style="width: 50px; height: 50px;" (click)="commentFileInput.click()" [disabled]="isSendingComment()">
+                <i class="fa-solid fa-image text-muted"></i>
+              </button>
+              <input
+                type="text"
+                class="form-control border-0 shadow-none rounded-pill px-4 py-3 comment-input flex-grow-1"
+                placeholder="Write a comment..."
+                [value]="newCommentText()"
+                [disabled]="isSendingComment()"
+                (input)="updateCommentText($event)"
+                (keyup.enter)="submitComment()" />
+              <button
+                type="button"
+                class="btn btn-primary rounded-circle composer-btn flex-shrink-0"
+                style="width: 50px; height: 50px;"
+                [disabled]="!newCommentText().trim() || isSendingComment()"
+                (click)="submitComment()">
+                @if (isSendingComment()) {
+                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                } @else {
+                  <i class="fa-solid fa-paper-plane"></i>
+                }
+              </button>
+            </div>
           </div>
 
           @if (!isLoadingComments() && comments().length === 0) {
@@ -106,6 +127,15 @@
                   <div class="comment-bubble flex-grow-1">
                     <h3 class="h6 fw-bold mb-1">{{ comment.username }}</h3>
                     <p class="mb-0 text-secondary">{{ comment.content }}</p>
+                    @if (comment.mediaType === 'IMAGE') {
+                    <img [src]="comment.mediaUrl" class="img-fluid rounded mt-2 object-fit-cover border" style="max-height: 200px;" alt="Comment media">
+                    }
+                    @else if (comment.mediaType === 'VIDEO') {
+                    <video controls class="img-fluid rounded mt-2 bg-dark object-fit-cover border" style="max-height: 200px;">
+                      <source [src]="comment.mediaUrl" type="video/mp4">
+                      Your browser does not support the video tag.
+                    </video>
+                    }
                   </div>
                 </div>
               }

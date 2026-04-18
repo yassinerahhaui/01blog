@@ -19,4 +19,8 @@ public interface ReportRepo extends JpaRepository<ReportEntity, UUID> {
             UUID targetId,
             ReportTargetType targetType,
             ReportStatus status);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("DELETE FROM ReportEntity r WHERE r.targetId = :targetId")
+    void deleteByTargetId(@org.springframework.data.repository.query.Param("targetId") UUID targetId);
 }

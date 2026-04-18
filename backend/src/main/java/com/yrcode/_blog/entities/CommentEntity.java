@@ -38,6 +38,13 @@ public class CommentEntity extends AbstractEntity {
     @Column(nullable=false, length=500)
     private String content;
 
+    @Column(columnDefinition = "TEXT", nullable = true)
+    private String mediaUrl;
+
+    @jakarta.persistence.Enumerated(jakarta.persistence.EnumType.STRING)
+    @lombok.Builder.Default
+    private com.yrcode._blog.enums.MediaType mediaType = com.yrcode._blog.enums.MediaType.EMPTY;
+
     public UUID getUserId() {
         return user.getId();
     }

@@ -14,6 +14,7 @@ public interface PostService {
     List<PostDetailsDTO> findAll();
     PostDetailsDTO createOne(PostCreateDTO data, MultipartFile file);
     void deleteOne(UUID id);
-    PostDetailsDTO updateOne(PostUpdateDTO data);
+    PostDetailsDTO updateOne(PostUpdateDTO data, MultipartFile file);
     PostDetailsDTO toggleHidePost(UUID id);
+    org.springframework.data.domain.Slice<PostDetailsDTO> getFeed(int page, int size);
 }

@@ -115,4 +115,8 @@ export class Profile implements OnInit {
   onScroll(): void {
     this.scrollSubject.next();
   }
+
+  onPostDeleted(postId: string) {
+    this.posts.update(current => current.filter(p => p.id !== postId));
+  }
 }

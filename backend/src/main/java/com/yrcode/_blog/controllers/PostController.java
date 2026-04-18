@@ -43,13 +43,23 @@ public class PostController {
     private PostService postService;
     @Autowired
     private CommentService commentService;
-    @Autowired ReactionService reactionService;
-    @Autowired ReportService reportService;
+    @Autowired
+    ReactionService reactionService;
+    @Autowired
+    ReportService reportService;
 
     @GetMapping("/all")
     public ResponseEntity<GlobalResponse<List<PostDetailsDTO>>> findAll() {
         List<PostDetailsDTO> posts = postService.findAll();
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(posts));
+    }
+
+    @GetMapping("/feed")
+    public ResponseEntity<GlobalResponse<org.springframework.data.domain.Slice<PostDetailsDTO>>> getFeed(
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "0") int page,
+            @org.springframework.web.bind.annotation.RequestParam(defaultValue = "20") int size) {
+        org.springframework.data.domain.Slice<PostDetailsDTO> feed = postService.getFeed(page, size);
+        return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(feed));
     }
 
     @GetMapping("/{postId}")
@@ -58,16 +68,18 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(post));
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<GlobalResponse<PostDetailsDTO>> updateOne(@RequestBody @Valid PostUpdateDTO postData) {
-        return null;
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GlobalResponse<PostDetailsDTO>> updateOne(
+            @RequestPart("data") @Valid PostUpdateDTO postData,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
+        PostDetailsDTO updatedPost = postService.updateOne(postData, file);
+        return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(updatedPost));
     }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GlobalResponse<PostDetailsDTO>> createOne(
             @RequestPart("data") @Valid PostCreateDTO postData,
-            @RequestPart(value = "file", required = false) MultipartFile file
-    ) {
+            @RequestPart(value = "file", required = false) MultipartFile file) {
         PostDetailsDTO post = postService.createOne(postData, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(post));
     }
@@ -84,12 +96,13 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(comments));
     }
 
-    @PostMapping("/{postId}/comments")
+    @PostMapping(value = "/{postId}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GlobalResponse<CommentDTO>> addComment(
             @PathVariable UUID postId,
-            @Valid @RequestBody CommentRequestDTO request) {
+            @RequestPart("data") @Valid CommentRequestDTO request,
+            @RequestPart(value = "file", required = false) MultipartFile file) {
 
-        CommentDTO newComment = commentService.addComment(postId, request);
+        CommentDTO newComment = commentService.addComment(postId, request, file);
         return ResponseEntity.status(HttpStatus.CREATED).body(new GlobalResponse<>(newComment));
     }
 

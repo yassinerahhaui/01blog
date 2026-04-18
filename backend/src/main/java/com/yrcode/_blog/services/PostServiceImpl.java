@@ -21,6 +21,9 @@ import com.yrcode._blog.enums.Role;
 import com.yrcode._blog.repositories.PostRepo;
 import com.yrcode._blog.repositories.ReactionRepo;
 import com.yrcode._blog.repositories.UserRepo;
+import com.yrcode._blog.repositories.CommentRepo;
+import com.yrcode._blog.repositories.NotificationRepo;
+import com.yrcode._blog.repositories.ReportRepo;
 import com.yrcode._blog.security.SecurityUtils;
 import com.yrcode._blog.shared.CustomResponseException;
 
@@ -39,12 +42,26 @@ public class PostServiceImpl implements PostService {
     private ReactionRepo reactionRepo;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private CommentRepo commentRepo;
+    @Autowired
+    private NotificationRepo notificationRepo;
+    @Autowired
+    private ReportRepo reportRepo;
 
     @Override
     public PostDetailsDTO findOne(UUID id) {
         PostEntity post = postRepo.findById(id)
                 .orElseThrow(() -> CustomResponseException.BadRequest("invalid post id!"));
+
         UUID currentUserId = securityUtils.getCurrentUserId();
+        UserEntity currentUser = userRepo.findById(currentUserId).orElse(null);
+        boolean isAdmin = currentUser != null && currentUser.getRole() == Role.ADMIN;
+
+        if (post.getIsHidden() && !isAdmin && !post.getUserId().equals(currentUserId)) {
+            throw CustomResponseException.NotFound("Post not found or has been hidden.");
+        }
+
         boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
         return PostDetailsDTO.builder()
                 .id(post.getId())
@@ -76,21 +93,20 @@ public class PostServiceImpl implements PostService {
                 .map(post -> {
                     boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
                     return PostDetailsDTO.builder()
-                    .id(post.getId())
-                    .title(post.getTitle())
-                    .content(post.getContent())
-                    .mediaUrl(post.getMediaUrl())
-                    .mediaType(post.getMediaType())
-                    .userId(post.getUserId())
-                    .username(post.getUsername())
-                    .commentsCount(post.getCommentsCount())
-                    .likesCount(post.getLikesCount())
-                    .isLikedByMe(isLiked)
-                    .isHidden(post.getIsHidden())
-                    .createdAt(post.getCreatedAt())
-                    .build();
-                }
-                ).collect(toList());
+                            .id(post.getId())
+                            .title(post.getTitle())
+                            .content(post.getContent())
+                            .mediaUrl(post.getMediaUrl())
+                            .mediaType(post.getMediaType())
+                            .userId(post.getUserId())
+                            .username(post.getUsername())
+                            .commentsCount(post.getCommentsCount())
+                            .likesCount(post.getLikesCount())
+                            .isLikedByMe(isLiked)
+                            .isHidden(post.getIsHidden())
+                            .createdAt(post.getCreatedAt())
+                            .build();
+                }).collect(toList());
     }
 
     @Override
@@ -149,7 +165,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDetailsDTO updateOne(PostUpdateDTO data) {
+    public PostDetailsDTO updateOne(PostUpdateDTO data, MultipartFile file) {
         UUID currentUserId = securityUtils.getCurrentUserId();
         PostEntity post = postRepo.findById(data.id())
                 .orElseThrow(() -> CustomResponseException.BadRequest("Invalid post id!"));
@@ -160,6 +176,26 @@ public class PostServiceImpl implements PostService {
 
         post.setTitle(data.title());
         post.setContent(data.content());
+
+        // Media handling
+        if (file != null && !file.isEmpty()) {
+            // Delete old media if present
+            if (post.getMediaUrl() != null) {
+                fileStorageService.deleteFile(post.getMediaUrl());
+            }
+            String newMediaUrl = fileStorageService.uploadFile(file);
+            post.setMediaUrl(newMediaUrl);
+            post.setMediaType(MediaType.fromString(file.getContentType()));
+        } else if (Boolean.TRUE.equals(data.removeMedia())) {
+            // Explicitly remove media without uploading a new one
+            if (post.getMediaUrl() != null) {
+                fileStorageService.deleteFile(post.getMediaUrl());
+            }
+            post.setMediaUrl(null);
+            post.setMediaType(MediaType.EMPTY);
+        }
+        // else: keep existing media unchanged
+
         PostEntity savedPost = postRepo.save(post);
 
         boolean isLiked = reactionRepo.existsByPostIdAndUserId(savedPost.getId(), currentUserId);
@@ -180,6 +216,7 @@ public class PostServiceImpl implements PostService {
                 .build();
     }
 
+    @org.springframework.transaction.annotation.Transactional
     @Override
     public void deleteOne(UUID id) {
         UUID currentUserId = securityUtils.getCurrentUserId();
@@ -197,6 +234,14 @@ public class PostServiceImpl implements PostService {
         if (mediaUrl != null) {
             fileStorageService.deleteFile(mediaUrl);
         }
+
+        // Manually delete related entities to avoid FK constraint violations
+        // since the ON DELETE CASCADE schema update might not have applied in the DB
+        reactionRepo.deleteByPostId(id);
+        commentRepo.deleteByPostId(id);
+        notificationRepo.deleteByReferenceId(id);
+        reportRepo.deleteByTargetId(id);
+
         postRepo.deleteById(id);
     }
 
@@ -204,7 +249,7 @@ public class PostServiceImpl implements PostService {
     public PostDetailsDTO toggleHidePost(UUID id) {
         PostEntity post = postRepo.findById(id)
                 .orElseThrow(() -> CustomResponseException.BadRequest("Invalid post id!"));
-        
+
         post.setIsHidden(!post.getIsHidden());
         PostEntity savedPost = postRepo.save(post);
 
@@ -225,5 +270,30 @@ public class PostServiceImpl implements PostService {
                 .isHidden(savedPost.getIsHidden())
                 .createdAt(savedPost.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public org.springframework.data.domain.Slice<PostDetailsDTO> getFeed(int page, int size) {
+        UUID currentUserId = securityUtils.getCurrentUserId();
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Slice<PostEntity> postSlice = postRepo.findFeedPosts(currentUserId, pageable);
+
+        return postSlice.map(post -> {
+            boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);
+            return PostDetailsDTO.builder()
+                    .id(post.getId())
+                    .title(post.getTitle())
+                    .content(post.getContent())
+                    .mediaUrl(post.getMediaUrl())
+                    .mediaType(post.getMediaType())
+                    .userId(post.getUserId())
+                    .username(post.getUsername())
+                    .commentsCount(post.getCommentsCount())
+                    .likesCount(post.getLikesCount())
+                    .isLikedByMe(isLiked)
+                    .isHidden(post.getIsHidden())
+                    .createdAt(post.getCreatedAt())
+                    .build();
+        });
     }
 }

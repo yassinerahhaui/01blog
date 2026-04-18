@@ -28,6 +28,8 @@ export class PostDetails {
   isLiking = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
   newCommentText = signal<string>('');
+  commentFile = signal<File | null>(null);
+  commentMediaPreview = signal<string | null>(null);
   renderedContent = computed(() => {
     const content = this.post()?.content ?? '';
     return this.sanitizer.sanitize(SecurityContext.HTML, renderMarkdown(content)) ?? '';
@@ -115,7 +117,7 @@ export class PostDetails {
 
     this.isSendingComment.set(true);
 
-    this.postService.addComment(currentPost.id, content).subscribe({
+    this.postService.addComment(currentPost.id, content, this.commentFile()).subscribe({
       next: (res: ApiResponse<Comment>) => {
         this.comments.update((current) => [res.data, ...current]);
         this.post.set({
@@ -123,12 +125,31 @@ export class PostDetails {
           commentsCount: currentPost.commentsCount + 1,
         });
         this.newCommentText.set('');
+        this.commentFile.set(null);
+        this.commentMediaPreview.set(null);
         this.isSendingComment.set(false);
       },
       error: () => {
         this.isSendingComment.set(false);
       },
     });
+  }
+
+  handleCommentFileChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0] ?? null;
+    this.commentFile.set(file);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => this.commentMediaPreview.set(e.target?.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      this.commentMediaPreview.set(null);
+    }
+  }
+
+  removeCommentMedia() {
+    this.commentFile.set(null);
+    this.commentMediaPreview.set(null);
   }
 
   updateCommentText(event: Event) {

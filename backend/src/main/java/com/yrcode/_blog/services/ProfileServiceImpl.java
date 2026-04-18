@@ -96,6 +96,9 @@ public class ProfileServiceImpl implements ProfileService {
                 .collect(Collectors.toList());
     }
 
+    @Autowired
+    private com.yrcode._blog.abstracts.NotificationService notificationService;
+
     @Override
     @Transactional
     public String toggleFollow(UUID targetUserId) {
@@ -120,6 +123,14 @@ public class ProfileServiceImpl implements ProfileService {
         } else {
             targetUser.getFollowers().add(currentUser);
             userRepo.save(targetUser);
+            
+            // Notify the followed user
+            try {
+                notificationService.notifyFollow(currentUserId, targetUserId);
+            } catch (Exception e) {
+                // Ignore notification errors
+            }
+            
             return "Followed successfully";
         }
     }

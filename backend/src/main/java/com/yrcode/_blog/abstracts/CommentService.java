@@ -8,5 +8,5 @@ import com.yrcode._blog.dtos.comment.CommentRequestDTO;
 
 public interface CommentService {
     List<CommentDTO> getPostComments(UUID postId);
-    CommentDTO addComment(UUID postId, CommentRequestDTO requestDTO);
+    CommentDTO addComment(UUID postId, CommentRequestDTO requestDTO, org.springframework.web.multipart.MultipartFile file);
 }
