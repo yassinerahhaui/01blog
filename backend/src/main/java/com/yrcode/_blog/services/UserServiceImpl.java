@@ -5,6 +5,9 @@ import java.util.UUID;
 import static java.util.stream.Collectors.toList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.yrcode._blog.abstracts.UserService;
@@ -24,17 +27,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private SecurityUtils securityUtils;
 
-    @Override
-    public UserDetailsDTO findOne(UUID userId) {
-        UserEntity user = userRepo.findById(userId)
-                .orElseThrow(() -> CustomResponseException.NotFound("User not found!"));
-
-        UUID currentUserId = securityUtils.getCurrentUserId();
-
+    private UserDetailsDTO mapToUserDetailsDTO(UserEntity user, UUID currentUserId) {
         boolean isFollowedByMe = userRepo.isFollowedByMe(currentUserId, user.getId());
 
-        // System.err.println("followers" + user.getFollowersCount() + "following: " + user.getFollowingCount());
-        
         return UserDetailsDTO.builder()
                 .id(user.getId())
                 .fullName(user.getFullName())
@@ -50,26 +45,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDetailsDTO findOne(UUID userId) {
+        UserEntity user = userRepo.findById(userId)
+                .orElseThrow(() -> CustomResponseException.NotFound("User not found!"));
+
+        UUID currentUserId = securityUtils.getCurrentUserId();
+
+        return mapToUserDetailsDTO(user, currentUserId);
+    }
+
+    @Override
     public List<UserDetailsDTO> findAll() {
         List<UserEntity> users = userRepo.findAll();
         UUID currentUserId = securityUtils.getCurrentUserId();
         return users.stream()
-                .map(user -> {
-                    boolean isFollowedByMe = userRepo.isFollowedByMe(currentUserId, user.getId());
-                    return UserDetailsDTO.builder()
-                        .id(user.getId())
-                        .fullName(user.getFullName())
-                        .username(user.getUsername())
-                        .email(user.getEmail())
-                        .avatarUrl(user.getAvatarUrl())
-                        .role(user.getRole())
-                        .access(user.getAccess())
-                        .followersCount(user.getFollowersCount())
-                        .followingCount(user.getFollowingCount())
-                        .isFollowedByMe(isFollowedByMe)
-                        .build();
-                })
+                .map(user -> mapToUserDetailsDTO(user, currentUserId))
                 .collect(toList());
+    }
+
+    @Override
+    public Slice<UserDetailsDTO> searchUsers(String query, int page, int size) {
+        UUID currentUserId = securityUtils.getCurrentUserId();
+        String normalizedQuery = query == null ? "" : query.trim();
+
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        Pageable pageable = PageRequest.of(safePage, safeSize);
+
+        Slice<UserEntity> usersSlice = userRepo.searchUsers(normalizedQuery, pageable);
+        return usersSlice.map(user -> mapToUserDetailsDTO(user, currentUserId));
     }
 
     @Override

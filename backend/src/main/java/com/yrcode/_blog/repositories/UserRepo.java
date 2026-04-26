@@ -3,6 +3,8 @@ package com.yrcode._blog.repositories;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +24,11 @@ public interface UserRepo extends JpaRepository<UserEntity, UUID> {
 
     @Query(value = "SELECT COUNT(*) > 0 FROM user_followers WHERE follower_id = :currentUserId AND user_id = :targetUserId", nativeQuery = true)
     boolean isFollowedByMe(@Param("currentUserId") UUID currentUserId, @Param("targetUserId") UUID targetUserId);
+
+    @Query("SELECT u FROM UserEntity u "
+            + "WHERE (:query = '' "
+            + "OR LOWER(u.username) LIKE LOWER(CONCAT('%', :query, '%')) "
+            + "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%'))) "
+            + "ORDER BY COALESCE(u.lastUpdate, u.createdAt) DESC, u.createdAt DESC, u.id DESC")
+    Slice<UserEntity> searchUsers(@Param("query") String query, Pageable pageable);
 }

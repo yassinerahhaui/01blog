@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -300,10 +303,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public org.springframework.data.domain.Slice<PostDetailsDTO> getFeed(int page, int size) {
+    public Slice<PostDetailsDTO> getFeed(int page, int size) {
         UUID currentUserId = securityUtils.getCurrentUserId();
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-        org.springframework.data.domain.Slice<PostEntity> postSlice = postRepo.findFeedPosts(currentUserId, pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Slice<PostEntity> postSlice = postRepo.findFeedPosts(currentUserId, pageable);
 
         return postSlice.map(post -> {
             boolean isLiked = reactionRepo.existsByPostIdAndUserId(post.getId(), currentUserId);

@@ -7,7 +7,7 @@ import com.yrcode._blog.dtos.post.PostDetailsDTO;
 import com.yrcode._blog.dtos.user.FollowerDTO;
 
 public interface ProfileService {
-    Slice<PostDetailsDTO> getProfilePosts(UUID userId, int page);
+    Slice<PostDetailsDTO> getProfilePosts(UUID userId, int page, int size);
     List<FollowerDTO> getFollowers(UUID userId);
     List<FollowerDTO> getFollowing(UUID userId);
     String toggleFollow(UUID targetUserId);

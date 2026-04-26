@@ -41,9 +41,10 @@ public class ProfileController {
     @GetMapping("/{targetUserId}/posts")
     public ResponseEntity<GlobalResponse<Slice<PostDetailsDTO>>> findCurrentUserPosts(
             @PathVariable UUID targetUserId,
-            @RequestParam(defaultValue = "0") int page) {
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size) {
         // UUID userId = securityUtils.getCurrentUserId();
-        Slice<PostDetailsDTO> posts = profileService.getProfilePosts(targetUserId, page);
+        Slice<PostDetailsDTO> posts = profileService.getProfilePosts(targetUserId, page, size);
         return ResponseEntity.status(HttpStatus.OK).body(new GlobalResponse<>(posts));
     }
 

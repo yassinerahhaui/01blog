@@ -35,9 +35,10 @@ public class ProfileServiceImpl implements ProfileService {
     private ReactionRepo reactionRepo;
 
     @Override
-    public Slice<PostDetailsDTO> getProfilePosts(UUID userId, int page) {
-        int size = 20;
-        Pageable pageable = PageRequest.of(page, size);
+    public Slice<PostDetailsDTO> getProfilePosts(UUID userId, int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        Pageable pageable = PageRequest.of(safePage, safeSize);
         UUID currentUserId = securityUtils.getCurrentUserId();
 
         Slice<PostEntity> posts = postRepo.findPostsByUserOrdered(userId, pageable);
