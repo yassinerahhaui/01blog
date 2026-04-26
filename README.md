@@ -1,71 +1,72 @@
 # 01Blog
 
-A social blogging platform where students share their learning experiences, discoveries, and progress. Users can create posts with media, follow each other, like and comment on content, and report inappropriate behavior. Admins have a full moderation dashboard.
+01Blog is a social blogging platform where users can publish posts with media, follow other users, react/comment, and report content. Admins have dedicated moderation tools.
 
-## Tech Stack
+## Used Technologies
 
-| Layer | Technology |
-|-------|-----------|
-| **Backend** | Java 17, Spring Boot 3, Spring Security, JWT |
-| **Frontend** | Angular 21, TypeScript, Bootstrap 5, SCSS |
-| **Database** | PostgreSQL 16 |
-| **File Storage** | MinIO (S3-compatible) |
-| **Containerization** | Docker, Docker Compose |
+| Layer | Technologies |
+|---|---|
+| Backend | Java 17, Spring Boot 4, Spring Security, Spring Data JPA, JWT |
+| Frontend | Angular 21, TypeScript, RxJS, Bootstrap 5, SCSS |
+| Database | PostgreSQL 16 |
+| Object Storage | MinIO (S3-compatible) |
+| DevOps | Docker, Docker Compose |
+| Build tools | Maven Wrapper, npm |
 
-## Features
+## Main Features
 
-- **Authentication** — Register, login, JWT-based session, role-based access (USER / ADMIN)
-- **Posts** — Create, edit, delete posts with image/video upload and markdown support
-- **Social** — Follow/unfollow users, like and comment on posts, notifications
-- **Profiles** — Public user profiles with paginated post feeds and infinite scroll
-- **Reporting** — Report users or posts with reason and details
-- **Admin Dashboard** — Sidebar navigation with user management, post moderation, and report review
-- **Dark Mode** — Toggle between light and dark themes
-- **Responsive** — Mobile-friendly layout using Bootstrap 5
+- Authentication and authorization with JWT.
+- Create, update, and delete posts with media upload.
+- Like and comment interactions.
+- Follow and unfollow users.
+- User and post reporting workflows.
+- Admin dashboard for moderation and access management.
+- Infinite-scroll feeds on Home and Profile pages.
 
-## Prerequisites
+## Setup Instructions
 
-- [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/)
-- (For local dev) Java 17+, Node.js 20+, npm
+### Prerequisites
 
-## Quick Start with Docker
+- Docker and Docker Compose.
+- For local (non-container) app execution: Java 17+, Node.js 20+, npm.
+
+### Option 1: Run Everything with Docker Compose
+
+1. From the project root, build and start all services:
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd 01blog
-
-# Start all services (PostgreSQL, MinIO, Backend, Frontend)
 docker compose up --build
+```
 
-# Create the MinIO bucket (run once after first start)
+2. Create the MinIO bucket (run once after the first start):
+
+```bash
 docker exec minio-server sh -c "mc alias set myminio http://localhost:9000 yassine_admin SuperSecretPassword123 && mc mb myminio/01blog-images --ignore-existing && mc anonymous set download myminio/01blog-images"
 ```
 
-The app will be available at:
-- **Frontend**: http://localhost:4200
-- **Backend API**: http://localhost:8080
-- **MinIO Console**: http://localhost:9001
+3. Access the services:
 
-## Running Locally (Development)
+- Frontend: http://0.0.0.0:4200
+- Backend API: http://localhost:8080
+- MinIO API: http://localhost:9000
+- MinIO Console: http://localhost:9001
 
-### Database & Storage
+### Option 2: Local Development (Frontend and Backend), Infra in Docker
+
+1. Start infrastructure services only:
 
 ```bash
-# Start only PostgreSQL and MinIO
 docker compose up db minio-server
 ```
 
-### Backend
+2. Run backend:
 
 ```bash
 cd backend
 ./mvnw spring-boot:run
 ```
 
-The API starts on `http://localhost:8080`.
-
-### Frontend
+3. Run frontend:
 
 ```bash
 cd frontend
@@ -73,78 +74,53 @@ npm install
 npm start
 ```
 
-The dev server starts on `http://localhost:4200`.
+4. Open the application at http://0.0.0.0:4200.
+
+## Useful Commands
+
+### Backend
+
+```bash
+cd backend
+./mvnw -DskipTests compile
+./mvnw spring-boot:run
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+npm run build
+npm test
+```
 
 ## Project Structure
 
-```
+```text
 01blog/
-├── backend/                     # Spring Boot API
-│   └── src/main/java/com/yrcode/_blog/
-│       ├── controllers/         # REST controllers
-│       ├── services/            # Business logic
-│       ├── abstracts/           # Service interfaces
-│       ├── entities/            # JPA entities
-│       ├── repositories/        # Spring Data repos
-│       ├── dtos/                # Request/response DTOs
-│       ├── enums/               # Role, Access, MediaType, etc.
-│       ├── security/            # JWT filter, helper, utils
-│       ├── configurations/      # Security, MinIO, app config
-│       └── shared/              # Global response, exceptions
-├── frontend/                    # Angular app
-│   └── src/app/
-│       ├── pages/               # Route pages (home, profile, dashboard, etc.)
-│       ├── components/          # Reusable components (navbar, post-card, etc.)
-│       └── core/                # Services, guards, models, interceptors
-├── docker-compose.yml           # Multi-service orchestration
-└── README.md
+|- backend/
+|  |- src/main/java/com/yrcode/_blog/
+|  |  |- controllers/
+|  |  |- services/
+|  |  |- repositories/
+|  |  |- entities/
+|  |  |- security/
+|  |  |- dtos/
+|  |  |- configurations/
+|  |  `- shared/
+|- frontend/
+|  `- src/app/
+|     |- pages/
+|     |- components/
+|     `- core/
+|- docker-compose.yml
+`- README.md
 ```
 
-## API Endpoints
+## Notes
 
-### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Login and receive JWT |
-
-### Posts
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/post/all` | Get all posts |
-| GET | `/api/post/{id}` | Get single post |
-| POST | `/api/post/create` | Create post (multipart) |
-| PUT | `/api/post/update` | Update a post |
-| DELETE | `/api/post/{id}` | Delete a post |
-| POST | `/api/post/{id}/like` | Toggle like |
-| GET | `/api/post/{id}/comments` | Get comments |
-| POST | `/api/post/{id}/comments` | Add comment |
-| POST | `/api/post/{id}/report` | Report a post |
-
-### Users & Profiles
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/user/{id}` | Get user details |
-| PUT | `/api/user/update` | Update user profile |
-| POST | `/api/profile/{id}/follow` | Toggle follow |
-| GET | `/api/profile/{id}/posts` | Get user posts (paginated) |
-| GET | `/api/profile/{id}/followers` | Get followers list |
-| GET | `/api/profile/{id}/following` | Get following list |
-| POST | `/api/profile/{id}/report` | Report a user |
-
-### Notifications
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/notifications` | Get current user notifications |
-| PUT | `/api/notifications/{id}/read` | Mark one as read |
-| PUT | `/api/notifications/read-all` | Mark all as read |
-
-### Admin (requires ADMIN role)
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/admin/users` | List all users |
-| PUT | `/api/admin/users/{id}/access` | Ban/unban user |
-| DELETE | `/api/admin/users/{id}` | Delete user |
-| GET | `/api/admin/posts` | List all posts |
-| DELETE | `/api/admin/posts/{id}` | Delete post |
-| GET | `/api/admin/reports` | List all reports |
+- Frontend API base URL is configured as http://localhost:8080/api.
+- Backend default database points to PostgreSQL on localhost:5432.
+- MinIO defaults are configured in backend application properties and overridden in Docker where needed.
