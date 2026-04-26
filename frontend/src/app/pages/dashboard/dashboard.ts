@@ -78,11 +78,21 @@ export class Dashboard implements OnInit {
     const source = this.userReports();
     if (!term) return source;
 
-    return source.filter((report) =>
-      [report.reason, report.details, report.status, report.targetId, report.reporterId]
+    return source.filter((report) => {
+      const reporter = this.getReporterUser(report);
+
+      return [
+        report.reason,
+        report.details,
+        report.status,
+        report.targetId,
+        report.reporterId,
+        reporter?.username,
+        reporter?.fullName,
+      ]
         .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(term)),
-    );
+        .some((value) => String(value).toLowerCase().includes(term));
+    });
   });
 
   filteredPostReports = computed(() => {
@@ -90,11 +100,21 @@ export class Dashboard implements OnInit {
     const source = this.postReports();
     if (!term) return source;
 
-    return source.filter((report) =>
-      [report.reason, report.details, report.status, report.targetId, report.reporterId]
+    return source.filter((report) => {
+      const reporter = this.getReporterUser(report);
+
+      return [
+        report.reason,
+        report.details,
+        report.status,
+        report.targetId,
+        report.reporterId,
+        reporter?.username,
+        reporter?.fullName,
+      ]
         .filter(Boolean)
-        .some((value) => String(value).toLowerCase().includes(term)),
-    );
+        .some((value) => String(value).toLowerCase().includes(term));
+    });
   });
 
   ngOnInit(): void {
@@ -274,6 +294,10 @@ export class Dashboard implements OnInit {
 
   getReportedUser(report: AdminReport): UserInfo | undefined {
     return this.users().find((user) => user.id === report.targetId);
+  }
+
+  getReporterUser(report: AdminReport): UserInfo | undefined {
+    return this.users().find((user) => user.id === report.reporterId);
   }
 
   canModerateUser(user: UserInfo): boolean {

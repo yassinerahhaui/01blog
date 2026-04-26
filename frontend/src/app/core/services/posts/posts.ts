@@ -21,7 +21,7 @@ export class Posts {
     return this.http.get<ApiResponse<Post[]>>(`${this.apiUrl}/post/all`);
   }
 
-  getFeed(page: number = 0, size: number = 20): Observable<ApiResponse<SliceResponse<Post>>> {
+  getFeed(page: number = 0, size: number = 5): Observable<ApiResponse<SliceResponse<Post>>> {
     return this.http.get<ApiResponse<SliceResponse<Post>>>(
       `${this.apiUrl}/post/feed?page=${page}&size=${size}`
     );
@@ -35,9 +35,9 @@ export class Posts {
     return this.http.post(`${this.apiUrl}/post/create`, formData);
   }
 
-  getUserPosts(targetId: string, page: number = 0): Observable<ApiResponse<SliceResponse<Post>>> {
+  getUserPosts(targetId: string, page: number = 0, size: number = 5): Observable<ApiResponse<SliceResponse<Post>>> {
     return this.http.get<ApiResponse<SliceResponse<Post>>>(
-      `${this.apiUrl}/profile/${targetId}/posts?page=${page}`,
+      `${this.apiUrl}/profile/${targetId}/posts?page=${page}&size=${size}`,
     );
   }
 

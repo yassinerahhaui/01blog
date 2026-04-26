@@ -408,6 +408,12 @@
                 <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
               </a>
             </small>
+            <small class="text-muted d-block mt-1">Reported by:
+              <a [routerLink]="['/profile', report.reporterId]" target="_blank" class="text-decoration-none fw-bold ms-1">
+                {{ getReporterUser(report)?.username ? '@' + getReporterUser(report)?.username : report.reporterId }}
+                <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+              </a>
+            </small>
           </div>
           @if (report.status === 'OPEN') {
           <div class="d-flex flex-wrap gap-2 border-top pt-3">
@@ -464,6 +470,12 @@
             <small class="text-muted">Target:
               <a [routerLink]="['/post', report.targetId]" target="_blank" class="text-decoration-none fw-bold ms-1">
                 {{ report.targetId }}
+                <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
+              </a>
+            </small>
+            <small class="text-muted d-block mt-1">Reported by:
+              <a [routerLink]="['/profile', report.reporterId]" target="_blank" class="text-decoration-none fw-bold ms-1">
+                {{ getReporterUser(report)?.username ? '@' + getReporterUser(report)?.username : report.reporterId }}
                 <i class="fa-solid fa-arrow-up-right-from-square ms-1 small"></i>
               </a>
             </small>

@@ -11,6 +11,7 @@ import { adminGuard } from './core/guards/admin-guard';
 import { PostCreate } from './components/post-create/post-create';
 import { PostDetails } from './pages/post-details/post-details';
 import { Blocked } from './pages/auth/blocked/blocked';
+import { Users } from './pages/users/users';
 
 export const routes: Routes = [
   { path: '', component: Home, canActivate: [authGuard] },
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'profile/:id', component: Profile, canActivate: [authGuard] },
   { path: 'post/create', component: PostCreate, canActivate: [authGuard] },
   { path: 'post/:id', component: PostDetails, canActivate: [authGuard] },
+  { path: 'users', component: Users, canActivate: [authGuard] },
   { path: 'dashboard', component: Dashboard, canActivate: [authGuard, adminGuard] },
   { path: 'blocked', component: Blocked, canActivate: [authGuard] },
   { path: 'login', component: Login, canActivate: [notAuthGuard] },

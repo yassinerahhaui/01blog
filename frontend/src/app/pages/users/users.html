@@ -1,0 +1,78 @@
+<section class="container users-page py-4">
+  <header class="users-header mb-4">
+    <div>
+      <h1 class="h3 fw-bold mb-1">Users</h1>
+      <p class="text-muted mb-0">Browse all users and search by username or email.</p>
+    </div>
+
+    <form class="users-search" (submit)="submitSearch($event)">
+      <label for="usersSearchInput" class="visually-hidden">Search users by username or email</label>
+      <div class="input-group">
+        <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+        <input
+          id="usersSearchInput"
+          type="search"
+          class="form-control"
+          placeholder="Search by username or email"
+          [value]="searchTerm()"
+          (input)="updateSearch($event)">
+        @if (searchTerm()) {
+          <button type="button" class="btn btn-outline-secondary" (click)="clearSearch()">Clear</button>
+        }
+        <button type="submit" class="btn btn-primary">Search</button>
+      </div>
+    </form>
+  </header>
+
+  <div class="row g-3">
+    @for (user of users(); track user.id) {
+      <div class="col-12 col-md-6 col-xl-4">
+        <article class="user-tile rounded-4 p-3 h-100">
+          <a class="d-flex align-items-center gap-3 text-decoration-none text-reset" [routerLink]="['/profile', user.id]">
+            <img
+              class="user-avatar rounded-circle object-fit-cover"
+              width="56"
+              height="56"
+              [src]="user.avatarUrl || 'https://ui-avatars.com/api/?name=' + user.username + '&background=random'"
+              [alt]="user.username">
+
+            <div class="flex-grow-1 min-w-0">
+              <h2 class="h6 fw-bold mb-0 text-truncate">{{ user.fullName || user.username }}</h2>
+              <p class="small text-muted mb-0 text-truncate">&#64;{{ user.username }}</p>
+              <p class="small text-muted mb-0 text-truncate">{{ user.email }}</p>
+            </div>
+          </a>
+        </article>
+      </div>
+    }
+
+    @if (!isLoading() && users().length === 0) {
+      <div class="col-12">
+        <div class="empty-state rounded-4 p-5 text-center">
+          <h2 class="h5 fw-bold mb-2">No users found</h2>
+          <p class="text-muted mb-0">
+            @if (searchTerm()) {
+              No results match "{{ searchTerm() }}".
+            } @else {
+              There are no users to display yet.
+            }
+          </p>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="d-flex justify-content-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading users...</span>
+      </div>
+    </div>
+  }
+
+  @if (!hasMore() && users().length > 0) {
+    <div class="text-center text-muted my-5">
+      <p class="mb-0">All users loaded.</p>
+    </div>
+  }
+</section>

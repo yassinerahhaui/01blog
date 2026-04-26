@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -6,6 +6,7 @@ import { ApiResponse } from '../../models/api-response';
 import { UserInfo } from '../../models/user-info';
 import { ReportRequest } from '../../models/report-request';
 import { ReportResponse } from '../../models/report-response';
+import { SliceResponse } from '../../models/slice-response';
 
 @Injectable({
   providedIn: 'root',
@@ -34,6 +35,15 @@ export class Profile {
   // Fetch the list of users that the specified user is following
   getFollowing(userId: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile/${userId}/following`);
+  }
+
+  searchUsers(query: string = '', page: number = 0, size: number = 20): Observable<ApiResponse<SliceResponse<UserInfo>>> {
+    const params = new HttpParams()
+      .set('q', query.trim())
+      .set('page', String(page))
+      .set('size', String(size));
+
+    return this.http.get<ApiResponse<SliceResponse<UserInfo>>>(`${this.apiUrl}/user/search`, { params });
   }
 
   reportUser(targetUserId: string, payload: ReportRequest): Observable<ApiResponse<ReportResponse>> {

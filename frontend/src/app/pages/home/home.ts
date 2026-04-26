@@ -8,6 +8,12 @@ import { ApiResponse } from '../../core/models/api-response';
 import { SliceResponse } from '../../core/models/slice-response';
 import { Subject } from 'rxjs';
 import { throttleTime } from 'rxjs/operators';
+import { Auth } from '../../core/services/auth/auth';
+import { Profile } from '../../core/services/profile/profile';
+
+interface FollowingUserSummary {
+  id: string;
+}
 
 @Component({
   selector: 'app-home',
@@ -17,12 +23,20 @@ import { throttleTime } from 'rxjs/operators';
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
+  private readonly PAGE_SIZE = 5;
+  private readonly SCROLL_THRESHOLD_PX = 120;
 
   private postService = inject(Posts);
+  private authService = inject(Auth);
+  private profileService = inject(Profile);
+
   posts = signal<Post[]>([]);
   isLoading = signal<boolean>(false);
   hasMore = signal<boolean>(true);
   page = signal(0);
+  isFeedContextReady = signal<boolean>(false);
+  shouldFilterFeedByFollowing = signal<boolean>(false);
+  visibleAuthorIds = signal<Set<string>>(new Set());
 
   // Scroll Throttling Subject
   private scrollSubject = new Subject<void>();
@@ -35,21 +49,68 @@ export class Home implements OnInit {
       this.checkScroll();
     });
 
-    this.loadPosts();
+    this.loadFeedContextAndPosts();
+  }
+
+  private loadFeedContextAndPosts(): void {
+    const currentUserId = this.authService.currentUser()?.userId;
+
+    if (!currentUserId) {
+      this.isFeedContextReady.set(true);
+      this.hasMore.set(false);
+      return;
+    }
+
+    this.profileService.getFollowing(currentUserId).subscribe({
+      next: (res: ApiResponse<FollowingUserSummary[]>) => {
+        const allowedAuthorIds = new Set<string>([currentUserId]);
+
+        for (const user of res.data ?? []) {
+          if (user?.id) {
+            allowedAuthorIds.add(user.id);
+          }
+        }
+
+        this.visibleAuthorIds.set(allowedAuthorIds);
+        this.shouldFilterFeedByFollowing.set(true);
+        this.isFeedContextReady.set(true);
+        this.loadPosts();
+      },
+      error: (err) => {
+        console.error('Error loading following users:', err);
+        this.shouldFilterFeedByFollowing.set(false);
+        this.visibleAuthorIds.set(new Set());
+        this.isFeedContextReady.set(true);
+        this.loadPosts();
+      },
+    });
+  }
+
+  private canDisplayPost(post: Post): boolean {
+    if (!this.shouldFilterFeedByFollowing()) {
+      return true;
+    }
+
+    return this.visibleAuthorIds().has(post.userId);
   }
 
   loadPosts() {
-    if (this.isLoading() || !this.hasMore()) return;
+    if (!this.isFeedContextReady() || this.isLoading() || !this.hasMore()) return;
 
     this.isLoading.set(true);
 
-    this.postService.getFeed(this.page(), 20).subscribe({
+    this.postService.getFeed(this.page(), this.PAGE_SIZE).subscribe({
       next: (res: ApiResponse<SliceResponse<Post>>) => {
         if (res.errors === null) {
-          const newPosts = res.data.content.filter((post) => !post.isHidden);
+          const newPosts = res.data.content.filter((post) => !post.isHidden && this.canDisplayPost(post));
           this.posts.update(current => [...current, ...newPosts]);
           this.page.update(p => p + 1);
           this.hasMore.set(!res.data.last);
+
+          if (this.hasMore()) {
+            // Continue loading if viewport is still near the bottom after render.
+            setTimeout(() => this.checkScroll(), 0);
+          }
         }
         this.isLoading.set(false);
       },
@@ -61,7 +122,10 @@ export class Home implements OnInit {
   }
 
   checkScroll() {
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+    const currentBottom = window.innerHeight + window.scrollY;
+    const pageHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+    if (currentBottom >= pageHeight - this.SCROLL_THRESHOLD_PX) {
       this.loadPosts();
     }
   }

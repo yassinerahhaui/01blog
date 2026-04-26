@@ -19,6 +19,8 @@ import { throttleTime } from 'rxjs/operators';
   styleUrl: './profile.scss',
 })
 export class Profile implements OnInit {
+  private readonly PAGE_SIZE = 5;
+
   // Services
   private postService = inject(Posts);
   private route = inject(ActivatedRoute);
@@ -81,7 +83,7 @@ export class Profile implements OnInit {
     this.isLoading.set(true);
 
     // Fetch posts for the specific user
-    this.postService.getUserPosts(targetId, this.page()).subscribe({
+    this.postService.getUserPosts(targetId, this.page(), this.PAGE_SIZE).subscribe({
       next: (res: ApiResponse<SliceResponse<Post>>) => {
         if (res.errors === null) {
           const newPosts = res.data.content.filter((post) => !post.isHidden);
