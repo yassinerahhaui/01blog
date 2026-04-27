@@ -13,7 +13,7 @@
       <app-post-card [post]="post" (postDeleted)="onPostDeleted($event)"></app-post-card>
     </div>
     }
-    
+
     @if (!isLoading() && posts().length === 0) {
     <div class="col-12 alert alert-warning text-center py-4" role="alert">
       <h5 class="fw-bold text-secondary mb-2">No posts found! 📭</h5>

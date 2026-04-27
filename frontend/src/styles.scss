@@ -14,6 +14,7 @@
   --border-color: rgba(15, 23, 42, 0.1);
   --accent: #2563eb;
   --shadow-color: rgba(15, 23, 42, 0.08);
+  --btn-close-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23334155'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 0 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
   color-scheme: light;
 }
 
@@ -28,6 +29,7 @@
   --border-color: rgba(148, 163, 184, 0.2);
   --accent: #60a5fa;
   --shadow-color: rgba(2, 6, 23, 0.45);
+  --btn-close-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23e2e8f0'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 0 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e");
   color-scheme: dark;
 }
 
@@ -101,6 +103,30 @@ main {
 .btn-outline-primary,
 .btn-outline-danger {
   border-width: 1px;
+}
+
+.btn-close {
+  --bs-btn-close-bg: var(--btn-close-icon);
+  opacity: 1;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background-color: var(--surface-muted);
+  background-size: 0.72rem;
+  padding: 0.45rem;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.btn-close:hover {
+  background-color: color-mix(in srgb, var(--accent) 14%, var(--surface-muted));
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border-color));
+  transform: translateY(-1px);
+}
+
+.btn-close:focus {
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
 .form-control,

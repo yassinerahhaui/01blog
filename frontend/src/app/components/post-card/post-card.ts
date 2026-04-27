@@ -39,6 +39,15 @@ export class PostCard implements OnInit {
   reportDetails = signal<string>('');
   isSubmittingReport = signal<boolean>(false);
   reportFeedback = signal<{ type: 'success' | 'danger'; message: string } | null>(null);
+  reportReasonOptions: string[] = [
+    'Spam or misleading content',
+    'Harassment or hate speech',
+    'Violence or dangerous behavior',
+    'Sexual or explicit content',
+    'Copyright infringement',
+    'Scam or fraud',
+    'Other',
+  ];
 
   // Edit state
   isEditing = signal<boolean>(false);
@@ -146,7 +155,7 @@ export class PostCard implements OnInit {
   }
 
   updateReportReason(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
+    const inputElement = event.target as HTMLSelectElement;
     this.reportReason.set(inputElement.value);
   }
 
@@ -269,6 +278,8 @@ export class PostCard implements OnInit {
           this.reportReason.set('');
           this.reportDetails.set('');
           this.isSubmittingReport.set(false);
+          this.closeReportModal();
+          this.reportFeedback.set(null);
         },
         error: (err) => {
           const message = err?.error?.errors?.[0]?.message || 'Failed to submit this report.';
@@ -276,5 +287,22 @@ export class PostCard implements OnInit {
           this.isSubmittingReport.set(false);
         },
       });
+  }
+
+  private closeReportModal() {
+    if (typeof window === 'undefined') return;
+
+    const modalElement = document.getElementById(`reportPostModal-${this.post().id}`);
+    if (!modalElement) return;
+
+    const bootstrapApi = (window as any).bootstrap;
+    if (bootstrapApi?.Modal) {
+      const instance = bootstrapApi.Modal.getOrCreateInstance(modalElement);
+      instance.hide();
+      return;
+    }
+
+    const dismissButton = modalElement.querySelector('[data-bs-dismiss="modal"]') as HTMLButtonElement | null;
+    dismissButton?.click();
   }
 }

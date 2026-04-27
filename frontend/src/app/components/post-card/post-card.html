@@ -181,8 +181,13 @@
 
         <div class="mb-3">
           <label class="form-label fw-semibold">Reason</label>
-          <input type="text" class="form-control rounded-4" placeholder="Spam, abuse, plagiarism..."
-            [value]="reportReason()" (input)="updateReportReason($event)" [disabled]="isSubmittingReport()">
+          <select class="form-select rounded-4" [value]="reportReason()" (change)="updateReportReason($event)"
+            [disabled]="isSubmittingReport()">
+            <option value="" disabled>Select a reason</option>
+            @for (reason of reportReasonOptions; track reason) {
+            <option [value]="reason">{{ reason }}</option>
+            }
+          </select>
         </div>
 
         <div>
@@ -194,7 +199,7 @@
       </div>
 
       <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
-        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Close</button>
         <button type="button" class="btn btn-danger rounded-pill px-4"
           [disabled]="!reportReason().trim() || isSubmittingReport()" (click)="submitReport()">
           {{ isSubmittingReport() ? 'Submitting...' : 'Submit Report' }}

@@ -36,6 +36,15 @@ export class UserInfoCard implements OnInit {
   reportDetails = signal<string>('');
   isSubmittingReport = signal<boolean>(false);
   reportFeedback = signal<{ type: 'success' | 'danger'; message: string } | null>(null);
+  reportReasonOptions: string[] = [
+    'Harassment or bullying',
+    'Impersonation',
+    'Spam behavior',
+    'Hate speech',
+    'Scam or fraud',
+    'Inappropriate profile content',
+    'Other',
+  ];
 
   ngOnInit(): void {
     this.loadInfo();
@@ -117,7 +126,7 @@ export class UserInfoCard implements OnInit {
   }
 
   updateReportReason(event: Event) {
-    const inputElement = event.target as HTMLInputElement;
+    const inputElement = event.target as HTMLSelectElement;
     this.reportReason.set(inputElement.value);
   }
 
@@ -147,6 +156,8 @@ export class UserInfoCard implements OnInit {
           this.reportReason.set('');
           this.reportDetails.set('');
           this.isSubmittingReport.set(false);
+          this.closeReportModal();
+          this.reportFeedback.set(null);
         },
         error: (err) => {
           const message = err?.error?.errors?.[0]?.message || 'Failed to submit this report.';
@@ -154,5 +165,22 @@ export class UserInfoCard implements OnInit {
           this.isSubmittingReport.set(false);
         },
       });
+  }
+
+  private closeReportModal() {
+    if (typeof window === 'undefined') return;
+
+    const modalElement = document.getElementById('userReportModal');
+    if (!modalElement) return;
+
+    const bootstrapApi = (window as any).bootstrap;
+    if (bootstrapApi?.Modal) {
+      const instance = bootstrapApi.Modal.getOrCreateInstance(modalElement);
+      instance.hide();
+      return;
+    }
+
+    const dismissButton = modalElement.querySelector('[data-bs-dismiss="modal"]') as HTMLButtonElement | null;
+    dismissButton?.click();
   }
 }
