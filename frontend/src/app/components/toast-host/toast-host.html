@@ -1,0 +1,26 @@
+@if (toastService.toasts().length > 0) {
+  <div class="toast-stack position-fixed top-0 end-0 p-3">
+    @for (toast of toastService.toasts(); track toast.id) {
+      <div
+        class="toast align-items-center border-0 show"
+        [ngClass]="'text-bg-' + toast.variant"
+        role="alert"
+        aria-live="assertive"
+        aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            @if (toast.title) {
+              <div class="fw-bold mb-1">{{ toast.title }}</div>
+            }
+            {{ toast.message }}
+          </div>
+          <button
+            type="button"
+            class="btn-close btn-close-white me-2 m-auto"
+            aria-label="Close"
+            (click)="toastService.dismiss(toast.id)"></button>
+        </div>
+      </div>
+    }
+  </div>
+}

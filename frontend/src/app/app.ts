@@ -3,11 +3,12 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { Navbar } from './components/navbar/navbar';
 import { Theme } from './core/services/theme/theme';
 import { PopupHost } from './components/popup-host/popup-host';
+import { ToastHost } from './components/toast-host/toast-host';
 
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, PopupHost],
+  imports: [RouterOutlet, Navbar, PopupHost, ToastHost],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

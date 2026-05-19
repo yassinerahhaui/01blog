@@ -9,6 +9,7 @@ import { UserInfo } from '../../core/models/user-info';
 import { Post } from '../../core/models/post';
 import { AdminReport } from '../../core/models/admin-report';
 import { Popup } from '../../core/services/popup/popup';
+import { Toast } from '../../core/services/toast/toast';
 
 type SidebarSection = 'overview' | 'users' | 'posts' | 'user-reports' | 'post-reports';
 
@@ -23,6 +24,7 @@ export class Dashboard implements OnInit {
   private adminService = inject(Admin);
   private authService = inject(Auth);
   private popup = inject(Popup);
+  private toast = inject(Toast);
 
   activeSection = signal<SidebarSection>('overview');
   sidebarOpen = signal(false);
@@ -180,9 +182,21 @@ export class Dashboard implements OnInit {
           current.map((item) => (item.id === user.id ? { ...item, ...response.data } : item)),
         );
         this.processingUserId.set(null);
+        const actionVerb = nextAccess === 'BLOCKED' ? 'banned' : 'unbanned';
+        this.toast.show({
+          title: `User ${actionVerb}`,
+          message: `@${user.username} has been ${actionVerb}.`,
+          variant: nextAccess === 'BLOCKED' ? 'warning' : 'success',
+        });
       },
-      error: () => {
+      error: (err) => {
         this.processingUserId.set(null);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to update user access.';
+        this.toast.show({
+          title: 'Action failed',
+          message,
+          variant: 'danger',
+        });
       },
     });
   }
@@ -204,9 +218,20 @@ export class Dashboard implements OnInit {
       next: () => {
         this.users.update((current) => current.filter((item) => item.id !== user.id));
         this.deletingUserId.set(null);
+        this.toast.show({
+          title: 'User deleted',
+          message: `@${user.username} has been deleted.`,
+          variant: 'danger',
+        });
       },
-      error: () => {
+      error: (err) => {
         this.deletingUserId.set(null);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to delete this user.';
+        this.toast.show({
+          title: 'Delete failed',
+          message,
+          variant: 'danger',
+        });
       },
     });
   }
@@ -228,9 +253,20 @@ export class Dashboard implements OnInit {
       next: () => {
         this.posts.update((current) => current.filter((item) => item.id !== post.id));
         this.deletingPostId.set(null);
+        this.toast.show({
+          title: 'Post deleted',
+          message: `"${post.title}" has been deleted.`,
+          variant: 'danger',
+        });
       },
-      error: () => {
+      error: (err) => {
         this.deletingPostId.set(null);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to delete this post.';
+        this.toast.show({
+          title: 'Delete failed',
+          message,
+          variant: 'danger',
+        });
       },
     });
   }
@@ -255,9 +291,20 @@ export class Dashboard implements OnInit {
           current.map((item) => (item.id === post.id ? { ...item, isHidden: res.data.isHidden } : item)),
         );
         this.hidingPostId.set(null);
+        this.toast.show({
+          title: isUnhide ? 'Post unhidden' : 'Post hidden',
+          message: `"${post.title}" has been ${isUnhide ? 'unhidden' : 'hidden'}.`,
+          variant: isUnhide ? 'success' : 'warning',
+        });
       },
-      error: () => {
+      error: (err) => {
         this.hidingPostId.set(null);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to update post visibility.';
+        this.toast.show({
+          title: 'Action failed',
+          message,
+          variant: 'danger',
+        });
       },
     });
   }
@@ -285,9 +332,22 @@ export class Dashboard implements OnInit {
           return current.map((item) => (item.id === report.id ? { ...item, status: 'REVIEWED' } : item));
         });
         this.dismissingReportId.set(null);
+        this.toast.show({
+          title: removeFromQueue ? 'Report removed' : 'Report dismissed',
+          message: removeFromQueue
+            ? 'The report has been removed from the queue.'
+            : 'The report has been marked as reviewed.',
+          variant: removeFromQueue ? 'secondary' : 'success',
+        });
       },
-      error: () => {
+      error: (err) => {
         this.dismissingReportId.set(null);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to update this report.';
+        this.toast.show({
+          title: 'Action failed',
+          message,
+          variant: 'danger',
+        });
       },
     });
   }
@@ -323,19 +383,19 @@ export class Dashboard implements OnInit {
     const user = this.getReportedUser(report);
 
     if (!user) {
-      await this.popup.alert({
+      this.toast.show({
         title: 'User unavailable',
         message: 'User not found or already deleted.',
-        confirmVariant: 'warning',
+        variant: 'warning',
       });
       return;
     }
 
     if (!this.canModerateUser(user)) {
-      await this.popup.alert({
+      this.toast.show({
         title: 'Action not allowed',
         message: 'This account is protected and cannot be moderated.',
-        confirmVariant: 'warning',
+        variant: 'warning',
       });
       return;
     }
@@ -347,19 +407,19 @@ export class Dashboard implements OnInit {
     const user = this.getReportedUser(report);
 
     if (!user) {
-      await this.popup.alert({
+      this.toast.show({
         title: 'User unavailable',
         message: 'User not found or already deleted.',
-        confirmVariant: 'warning',
+        variant: 'warning',
       });
       return;
     }
 
     if (!this.canModerateUser(user)) {
-      await this.popup.alert({
+      this.toast.show({
         title: 'Action not allowed',
         message: 'This account is protected and cannot be moderated.',
-        confirmVariant: 'warning',
+        variant: 'warning',
       });
       return;
     }
@@ -380,10 +440,10 @@ export class Dashboard implements OnInit {
     if (post) {
       await this.deletePost(post);
     } else {
-      await this.popup.alert({
+      this.toast.show({
         title: 'Post unavailable',
         message: 'Post not found or already deleted.',
-        confirmVariant: 'warning',
+        variant: 'warning',
       });
     }
   }
@@ -393,10 +453,10 @@ export class Dashboard implements OnInit {
     if (post) {
       await this.hidePost(post);
     } else {
-      await this.popup.alert({
+      this.toast.show({
         title: 'Post unavailable',
         message: 'Post not found.',
-        confirmVariant: 'warning',
+        variant: 'warning',
       });
     }
   }

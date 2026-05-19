@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { LoginRequest } from '../../../core/models/login-request';
 import { Auth } from '../../../core/services/auth/auth';
+import { Toast } from '../../../core/services/toast/toast';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -14,6 +15,7 @@ import { CommonModule } from '@angular/common';
 export class Login {
   private authService = inject(Auth);
   private router = inject(Router);
+  private toast = inject(Toast);
   loginData: LoginRequest = {
     username: '',
     password: ''
@@ -25,18 +27,30 @@ export class Login {
     this.authService.login(this.loginData).subscribe({
       next: ()=> {
         if (this.authService.isBlocked()) {
+          this.toast.show({
+            title: 'Account blocked',
+            message: 'Your account is currently blocked. Contact support for help.',
+            variant: 'warning',
+          });
           this.router.navigate(['/blocked']);
           return;
         }
 
+        this.toast.show({
+          title: 'Signed in',
+          message: 'Welcome back!',
+          variant: 'success',
+        });
         this.router.navigate(['/']);
       },
       error: (err) => {
-        if (err.error?.errors?.[0]?.message) {
-            this.errorMessage.set(err.error.errors[0].message);
-        } else {
-            this.errorMessage.set("Invalid email or password. Please try again!");
-        }
+        const message = err.error?.errors?.[0]?.message || 'Invalid email or password. Please try again!';
+        this.errorMessage.set(message);
+        this.toast.show({
+          title: 'Login failed',
+          message,
+          variant: 'danger',
+        });
       }
     })
   }

@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { DomSanitizer } from '@angular/platform-browser';
 import { renderMarkdown } from '../../core/utils/markdown';
 import { Auth } from '../../core/services/auth/auth';
+import { Toast } from '../../core/services/toast/toast';
 
 @Component({
   selector: 'app-create-post',
@@ -20,6 +21,7 @@ export class PostCreate implements OnDestroy {
   private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
   private authService = inject(Auth);
+  private toast = inject(Toast);
   private platformId = inject(PLATFORM_ID);
   private objectUrl: string | null = null;
 
@@ -104,6 +106,7 @@ export class PostCreate implements OnDestroy {
       content: this.content(),
     };
 
+    // Backend expects JSON metadata plus optional media as multipart.
     formData.append('data', new Blob([JSON.stringify(postDto)], {
       type: 'application/json'
     }));
@@ -114,9 +117,21 @@ export class PostCreate implements OnDestroy {
 
     this.postService.createPost(formData).subscribe({
       next: () => {
+        this.isSubmitting.set(false);
+        this.toast.show({
+          title: 'Post published',
+          message: 'Your post is now live.',
+          variant: 'success',
+        });
         this.router.navigate(['/']);
       },
       error: (err) => {
+        const message = err?.error?.errors?.[0]?.message || 'Failed to publish this post.';
+        this.toast.show({
+          title: 'Publish failed',
+          message,
+          variant: 'danger',
+        });
         console.error('Error creating post', err);
         this.isSubmitting.set(false);
       }

@@ -56,7 +56,8 @@
           }
           @else {
           <button (click)="onToggleFollow()" class="btn fw-bold px-4 d-flex align-items-center gap-2 hover-lift"
-            [ngClass]="isFollowing() ? 'btn-light border text-dark' : 'btn-primary'">
+            [ngClass]="isFollowing() ? 'btn-light border text-dark' : 'btn-primary'"
+            [disabled]="isFollowingLoading()">
             <i class="fa-solid" [ngClass]="isFollowing() ? 'fa-user-check' : 'fa-user-plus'"></i>
             {{ isFollowing() ? 'Following' : 'Follow' }}
           </button>

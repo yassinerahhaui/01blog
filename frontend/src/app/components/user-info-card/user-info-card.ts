@@ -6,6 +6,7 @@ import { ApiResponse } from '../../core/models/api-response';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReportResponse } from '../../core/models/report-response';
+import { Toast } from '../../core/services/toast/toast';
 
 @Component({
   selector: 'app-user-info-card',
@@ -17,6 +18,7 @@ import { ReportResponse } from '../../core/models/report-response';
 export class UserInfoCard implements OnInit {
   private authService = inject(Auth);
   private profileService = inject(Profile);
+  private toast = inject(Toast);
 
   currentUser = signal(this.authService.currentUser());
   userId = input<string | undefined>();
@@ -107,20 +109,41 @@ export class UserInfoCard implements OnInit {
 
   onToggleFollow() {
     const targetId = this.userId();
-    if (!targetId) return;
+    if (!targetId || this.isFollowingLoading()) return;
+
+    this.isFollowingLoading.set(true);
 
     const currentlyFollowing = this.isFollowing();
     const currentCount = this.followersCount();
+    const profile = this.info();
+    const displayName = profile?.fullName || (profile?.username ? `@${profile.username}` : 'this user');
 
+    // Optimistic update; revert if the request fails.
     this.isFollowing.set(!currentlyFollowing);
     this.followersCount.set(currentlyFollowing ? currentCount - 1 : currentCount + 1);
 
     this.profileService.toggleFollow(targetId).subscribe({
-      next: () => {},
+      next: () => {
+        this.isFollowingLoading.set(false);
+        this.toast.show({
+          title: currentlyFollowing ? 'Unfollowed' : 'Following',
+          message: currentlyFollowing
+            ? `You have unfollowed ${displayName}.`
+            : `You are now following ${displayName}.`,
+          variant: 'success',
+        });
+      },
       error: (err) => {
         console.error(err);
         this.isFollowing.set(currentlyFollowing);
         this.followersCount.set(currentCount);
+        this.isFollowingLoading.set(false);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to update follow status.';
+        this.toast.show({
+          title: 'Follow failed',
+          message,
+          variant: 'danger',
+        });
       },
     });
   }
@@ -152,15 +175,23 @@ export class UserInfoCard implements OnInit {
       })
       .subscribe({
         next: (res: ApiResponse<ReportResponse>) => {
-          this.reportFeedback.set({ type: 'success', message: 'User report submitted for review.' });
           this.reportReason.set('');
           this.reportDetails.set('');
           this.isSubmittingReport.set(false);
           this.closeReportModal();
-          this.reportFeedback.set(null);
+          this.toast.show({
+            title: 'Report sent',
+            message: 'Thanks for letting us know. Our team will review this account.',
+            variant: 'success',
+          });
         },
         error: (err) => {
           const message = err?.error?.errors?.[0]?.message || 'Failed to submit this report.';
+          this.toast.show({
+            title: 'Report failed',
+            message,
+            variant: 'danger',
+          });
           this.reportFeedback.set({ type: 'danger', message });
           this.isSubmittingReport.set(false);
         },

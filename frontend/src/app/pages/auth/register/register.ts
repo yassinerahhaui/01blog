@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '../../../core/services/auth/auth';
 import { RegisterRequest } from '../../../core/models/register-request';
+import { Toast } from '../../../core/services/toast/toast';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -15,6 +16,7 @@ import { CommonModule } from '@angular/common';
 export class Register {
   private authService = inject(Auth);
   private router = inject(Router);
+  private toast = inject(Toast);
   registerData: RegisterRequest = {
     username: '',
     email: '',
@@ -28,18 +30,30 @@ export class Register {
     this.errorMessage.set(null);
     this.authService.register(this.registerData).subscribe({
       next: ()=> {
+        this.toast.show({
+          title: 'Account created',
+          message: 'Welcome to 01blog! Your account is ready.',
+          variant: 'success',
+        });
         this.router.navigate(['/']);
       },
       error: (err) => {
+        let message = '';
         if (err.error?.errors?.[0]?.message) {
-          this.errorMessage.set(err.error.errors[0].message);
+          message = err.error.errors[0].message;
         } else if (err.error?.message) {
-          this.errorMessage.set(err.error.message);
+          message = err.error.message;
         } else if (typeof err.error === 'string') {
-          this.errorMessage.set(err.error);
+          message = err.error;
         } else {
-          this.errorMessage.set("Registration failed. Please try again.");
+          message = 'Registration failed. Please try again.';
         }
+        this.errorMessage.set(message);
+        this.toast.show({
+          title: 'Registration failed',
+          message,
+          variant: 'danger',
+        });
       }
     })
   }

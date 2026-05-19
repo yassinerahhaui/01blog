@@ -8,6 +8,7 @@ import { ApiResponse } from '../../core/models/api-response';
 import { Comment } from '../../core/models/comment';
 import { UserInfoCard } from '../../components/user-info-card/user-info-card';
 import { renderMarkdown } from '../../core/utils/markdown';
+import { Toast } from '../../core/services/toast/toast';
 
 @Component({
   selector: 'app-post-details',
@@ -19,6 +20,7 @@ export class PostDetails {
   private route = inject(ActivatedRoute);
   private postService = inject(Posts);
   private sanitizer = inject(DomSanitizer);
+  private toast = inject(Toast);
 
   post = signal<Post | null>(null);
   comments = signal<Comment[]>([]);
@@ -95,8 +97,10 @@ export class PostDetails {
 
     const previousLiked = currentPost.isLikedByMe;
     const previousCount = currentPost.likesCount;
+    const nowLiked = !previousLiked;
 
     this.isLiking.set(true);
+    // Optimistic update; revert if the request fails.
     this.post.set({
       ...currentPost,
       isLikedByMe: !previousLiked,
@@ -106,12 +110,23 @@ export class PostDetails {
     this.postService.toggleLike(currentPost.id).subscribe({
       next: () => {
         this.isLiking.set(false);
+        this.toast.show({
+          title: nowLiked ? 'Post liked' : 'Like removed',
+          message: nowLiked ? 'You liked this post.' : 'You unliked this post.',
+          variant: 'success',
+        });
       },
-      error: () => {
+      error: (err) => {
         this.post.set({
           ...currentPost,
           isLikedByMe: previousLiked,
           likesCount: previousCount,
+        });
+        const message = err?.error?.errors?.[0]?.message || 'Failed to update like.';
+        this.toast.show({
+          title: 'Like failed',
+          message,
+          variant: 'danger',
         });
         this.isLiking.set(false);
       },
@@ -137,8 +152,19 @@ export class PostDetails {
         this.commentFile.set(null);
         this.commentMediaPreview.set(null);
         this.isSendingComment.set(false);
+        this.toast.show({
+          title: 'Comment posted',
+          message: 'Your comment is now live.',
+          variant: 'success',
+        });
       },
-      error: () => {
+      error: (err) => {
+        const message = err?.error?.errors?.[0]?.message || 'Failed to post this comment.';
+        this.toast.show({
+          title: 'Comment failed',
+          message,
+          variant: 'danger',
+        });
         this.isSendingComment.set(false);
       },
     });

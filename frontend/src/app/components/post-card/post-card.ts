@@ -7,6 +7,7 @@ import { Posts } from '../../core/services/posts/posts';
 import { ApiResponse } from '../../core/models/api-response';
 import { RouterLink } from "@angular/router";
 import { ReportResponse } from '../../core/models/report-response';
+import { Toast } from '../../core/services/toast/toast';
 
 @Component({
   selector: 'app-post-card',
@@ -19,6 +20,7 @@ export class PostCard implements OnInit {
   // Services
   authService = inject(Auth);
   postService = inject(Posts);
+  private toast = inject(Toast);
 
   // Inputs & User State
   currentUser = signal(this.authService.currentUser());
@@ -78,18 +80,31 @@ export class PostCard implements OnInit {
   onToggleLike() {
     const currentlyLiked = this.isLiked();
     const currentCount = this.likesCount();
+    const nowLiked = !currentlyLiked;
 
+    // Optimistic update; revert if the request fails.
     this.isLiked.set(!currentlyLiked);
     this.likesCount.set(currentlyLiked ? currentCount - 1 : currentCount + 1);
 
     this.postService.toggleLike(this.post().id).subscribe({
       next: (res: ApiResponse<any>) => {
         console.log('Reaction toggled:', res.data);
+        this.toast.show({
+          title: nowLiked ? 'Post liked' : 'Like removed',
+          message: nowLiked ? 'You liked this post.' : 'You unliked this post.',
+          variant: 'success',
+        });
       },
       error: (err) => {
         console.error('Error toggling like:', err);
         this.isLiked.set(currentlyLiked);
         this.likesCount.set(currentCount);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to update like.';
+        this.toast.show({
+          title: 'Like failed',
+          message,
+          variant: 'danger',
+        });
       }
     });
   }
@@ -105,6 +120,11 @@ export class PostCard implements OnInit {
       },
       error: (err) => {
         console.error('Error loading comments:', err);
+        this.toast.show({
+          title: 'Comments failed',
+          message: 'Unable to load comments right now.',
+          variant: 'danger',
+        });
         this.isLoadingComments.set(false);
       }
     });
@@ -124,8 +144,19 @@ export class PostCard implements OnInit {
         this.commentFile.set(null);
         this.commentMediaPreview.set(null);
         this.isSendingComment.set(false);
+        this.toast.show({
+          title: 'Comment posted',
+          message: 'Your comment is now live.',
+          variant: 'success',
+        });
       },
       error: (err) => {
+        const message = err?.error?.errors?.[0]?.message || 'Failed to post this comment.';
+        this.toast.show({
+          title: 'Comment failed',
+          message,
+          variant: 'danger',
+        });
         console.error('Error adding comment:', err);
         this.isSendingComment.set(false);
       }
@@ -229,8 +260,19 @@ export class PostCard implements OnInit {
         this.editMediaPreview.set(null);
         this.removeMedia.set(false);
         this.isSaving.set(null);
+        this.toast.show({
+          title: 'Post updated',
+          message: 'Your changes have been saved.',
+          variant: 'success',
+        });
       },
-      error: () => {
+      error: (err) => {
+        const message = err?.error?.errors?.[0]?.message || 'Failed to update this post.';
+        this.toast.show({
+          title: 'Update failed',
+          message,
+          variant: 'danger',
+        });
         this.isSaving.set(null);
       },
     });
@@ -250,10 +292,21 @@ export class PostCard implements OnInit {
     this.postService.deletePost(this.post().id).subscribe({
       next: () => {
         this.postDeleted.emit(this.post().id);
+        this.toast.show({
+          title: 'Post deleted',
+          message: 'Your post has been removed.',
+          variant: 'danger',
+        });
       },
-      error: () => {
+      error: (err) => {
         this.isDeleting.set(false);
         this.isConfirmingDelete.set(false);
+        const message = err?.error?.errors?.[0]?.message || 'Failed to delete this post.';
+        this.toast.show({
+          title: 'Delete failed',
+          message,
+          variant: 'danger',
+        });
       },
     });
   }
@@ -274,15 +327,23 @@ export class PostCard implements OnInit {
       })
       .subscribe({
         next: (res: ApiResponse<ReportResponse>) => {
-          this.reportFeedback.set({ type: 'success', message: 'Report submitted for review.' });
           this.reportReason.set('');
           this.reportDetails.set('');
           this.isSubmittingReport.set(false);
           this.closeReportModal();
-          this.reportFeedback.set(null);
+          this.toast.show({
+            title: 'Report sent',
+            message: 'Thanks for letting us know. Our team will review this post.',
+            variant: 'success',
+          });
         },
         error: (err) => {
           const message = err?.error?.errors?.[0]?.message || 'Failed to submit this report.';
+          this.toast.show({
+            title: 'Report failed',
+            message,
+            variant: 'danger',
+          });
           this.reportFeedback.set({ type: 'danger', message });
           this.isSubmittingReport.set(false);
         },
