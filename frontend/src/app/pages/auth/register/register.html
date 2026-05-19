@@ -19,7 +19,7 @@
       <form #registerForm="ngForm" (ngSubmit)="onRegister()">
 
         <div class="form-floating mb-3">
-          <input type="text" class="form-control" id="usernameInput" placeholder="Username" name="username"
+          <input type="text" class="form-control" id="usernameInput" placeholder="" name="username"
             [(ngModel)]="registerData.username" required minlength="3" maxlength="20" pattern="^[a-zA-Z0-9_-]+$"
             #usernameCtrl="ngModel"
             [ngClass]="{ 'is-invalid': usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched) }">
@@ -37,7 +37,7 @@
         </div>
 
         <div class="form-floating mb-3">
-          <input type="email" class="form-control" id="emailInput" placeholder="name@example.com" name="email"
+          <input type="email" class="form-control" id="emailInput" placeholder="" name="email"
             [(ngModel)]="registerData.email" required pattern="^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,4}$" #emailCtrl="ngModel"
             [ngClass]="{ 'is-invalid': emailCtrl.invalid && (emailCtrl.dirty || emailCtrl.touched) }">
           <label for="emailInput" class="text-muted">Email address</label>
@@ -51,7 +51,7 @@
         </div>
 
         <div class="form-floating mb-3">
-          <input type="password" class="form-control" id="passwordInput" placeholder="Password" name="password"
+          <input type="password" class="form-control" id="passwordInput" placeholder="" name="password"
             [(ngModel)]="registerData.password" required minlength="8"
             pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=]).*$" #passwordCtrl="ngModel"
             [ngClass]="{ 'is-invalid': passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched) }">
@@ -68,7 +68,7 @@
         </div>
 
         <div class="form-floating mb-4">
-          <input type="password" class="form-control" id="confirmPasswordInput" placeholder="Confirm Password"
+          <input type="password" class="form-control" id="confirmPasswordInput" placeholder=""
             name="passwordConfirmation" [(ngModel)]="registerData.passwordConfirmation" required #confirmCtrl="ngModel"
             [ngClass]="{ 'is-invalid': (confirmCtrl.invalid || registerData.password !== registerData.passwordConfirmation) && (confirmCtrl.dirty || confirmCtrl.touched) }">
           <label for="confirmPasswordInput" class="text-muted">Confirm Password</label>

@@ -28,12 +28,12 @@
 
         <form #loginForm="ngForm" (ngSubmit)="onLogin()">
 
-          <div class="mb-3">
-            <label for="usernameInput" class="form-label fw-semibold small mb-1">Email or username</label>
+          <div class="form-floating mb-3">
             <input type="text" class="form-control login-input"
               [ngClass]="{ 'is-invalid': usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched) }"
               name="username" [(ngModel)]="loginData.username" id="usernameInput"
-              placeholder="Enter your username or email..." required minlength="3" #usernameCtrl="ngModel">
+              placeholder="" required minlength="3" #usernameCtrl="ngModel">
+            <label for="usernameInput" class="form-label">Email or username</label>
 
             @if (usernameCtrl.invalid && (usernameCtrl.dirty || usernameCtrl.touched)) {
             <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
@@ -43,12 +43,12 @@
             }
           </div>
 
-          <div class="mb-3">
-            <label for="passwordInput" class="form-label fw-semibold small mb-1">Password</label>
+          <div class="form-floating mb-3">
             <input type="password" class="form-control login-input"
               [ngClass]="{ 'is-invalid': passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched) }"
-              id="passwordInput" placeholder="Enter your password..." name="password" [(ngModel)]="loginData.password" required
+              id="passwordInput" placeholder="" name="password" [(ngModel)]="loginData.password" required
               minlength="6" #passwordCtrl="ngModel">
+            <label for="passwordInput" class="form-label">Password</label>
 
             @if (passwordCtrl.invalid && (passwordCtrl.dirty || passwordCtrl.touched)) {
             <div class="invalid-feedback text-start fw-semibold" style="font-size: 0.85rem;">
