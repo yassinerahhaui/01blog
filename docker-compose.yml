@@ -43,6 +43,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
     volumes:
       - ./backend:/app 
       - ~/.m2:/root/.m2 

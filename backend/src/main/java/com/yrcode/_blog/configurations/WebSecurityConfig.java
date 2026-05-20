@@ -49,7 +49,7 @@ public class WebSecurityConfig {
                 }))
                 .authorizeHttpRequests(req -> req.requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated())
-                .addFilterBefore(rateLimitFilter, JwtAuthFilter.class)
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager(http))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
