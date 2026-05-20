@@ -33,5 +33,30 @@
     "name": "minio.public-url",
     "type": "java.lang.String",
     "description": "A description for 'minio.public-url'"
+  },
+  {
+    "name": "rate-limit.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'rate-limit.enabled'"
+  },
+  {
+    "name": "rate-limit.capacity",
+    "type": "java.lang.String",
+    "description": "A description for 'rate-limit.capacity'"
+  },
+  {
+    "name": "rate-limit.window-seconds",
+    "type": "java.lang.String",
+    "description": "A description for 'rate-limit.window-seconds'"
+  },
+  {
+    "name": "rate-limit.eviction-seconds",
+    "type": "java.lang.String",
+    "description": "A description for 'rate-limit.eviction-seconds'"
+  },
+  {
+    "name": "rate-limit.eviction-interval-ms",
+    "type": "java.lang.String",
+    "description": "A description for 'rate-limit.eviction-interval-ms'"
   }
 ]}

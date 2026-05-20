@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.yrcode._blog.security.JwtAuthFilter;
+import com.yrcode._blog.security.RateLimitFilter;
 import com.yrcode._blog.services.AuthService;
 
 import java.util.Arrays;
@@ -35,6 +36,8 @@ public class WebSecurityConfig {
     private AuthService authService;
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -46,6 +49,7 @@ public class WebSecurityConfig {
                 }))
                 .authorizeHttpRequests(req -> req.requestMatchers("/api/auth/**").permitAll()
                 .anyRequest().authenticated())
+                .addFilterBefore(rateLimitFilter, JwtAuthFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .authenticationManager(authenticationManager(http))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
